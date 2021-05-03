@@ -6,17 +6,17 @@
 
 require('./bootstrap');
 
+import router from './router';
+import vuetify from './vuetify';
+import vuelidate from './vuelidate';
 
-import VueRouter from 'vue-router';
-import HeaderComponent from "./components/HeaderComponent";
-import TaskListComponent from "./components/TaskListComponent";
-import TaskShowComponent from "./components/TaskShowComponent";
-import TaskCreateComponent from "./components/TaskCreateComponent";
-import TaskEditComponent from "./components/TaskEditComponent";
+
+import './../sass/app.scss'
+
+import FrameComponent from "./components/layouts/FrameComponent";
 
 //おまじない？
 window.Vue = require('vue').default;
-
 
 /**
  * The following block of code may be used to automatically register your
@@ -29,40 +29,13 @@ window.Vue = require('vue').default;
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
- Vue.use(VueRouter);
- 
- const router = new VueRouter({
-     mode: 'history',
-     routes: [
-         {
-             path: '/tasks',
-             name: 'task.list',
-             component: TaskListComponent
-         },
-         {
-            path: '/tasks/:taskId',
-            name: 'task.show',
-            component: TaskShowComponent,
-            props: true
-         },
-         {
-            path: '/tasks/create',
-            name: 'task.create',
-            component: TaskCreateComponent
-         },
-         {
-            path: '/tasks/:taskId/edit',
-            name: 'task.edit',
-            component: TaskEditComponent,
-            props: true
-         },
-
-    ]
-    
- });
 
 //Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('header-component', HeaderComponent);
+
+//Vueコンポーネントをグローバル登録している。
+//グローバルに登録されたコンポーネントは、その後に作成されたルート Vue インスタンス(new Vue)のテンプレートで使用できます。
+//さらに、その Vue インスタンスのコンポーネントツリーのすべてのサブコンポーネント内でも使用できます。
+Vue.component('frame-component', FrameComponent);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -70,7 +43,11 @@ Vue.component('header-component', HeaderComponent);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+// プラグインとしての使用を宣言することで、router.jsを他のコンポーネントにおいて
+//インポートすることなくthis.$routerによってVue Routerにアクセス可能となる。
 const app = new Vue({
     el: '#app',
-    router
+    router,
+    vuetify,
+    vuelidate,
 });

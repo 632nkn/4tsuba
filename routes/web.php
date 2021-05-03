@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
+//laravel-log-viewer
+Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '.*');

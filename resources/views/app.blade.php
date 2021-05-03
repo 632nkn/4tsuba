@@ -12,13 +12,21 @@
 
      <!-- Styles -->
      <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
+
+     <!-- Fonts -->
+     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
  </head>
 
  <body>
      <div id="app">
-         <header-component></header-component>
-         <!-- <example-component></example-component>  -->
-         <router-view></router-view>
+         <!-- v-appは全てのコンポーネントのルート -->
+         <v-app>
+             <!-- レイアウト -->
+             <frame-component></frame-component>
+
+
+         </v-app>
      </div>
      <!-- Scripts -->
      <script src="{{ asset('/js/app.js') }}" defer></script>

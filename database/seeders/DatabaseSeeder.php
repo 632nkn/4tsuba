@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Database\Seeders\TasksTableSeeder;
+//ファクトリーを使うためにインポート (modelのfactory()メソッドを使う)
+use App\Models\Thread;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,7 +17,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        User::factory(10)->create();
         $this->call(TasksTableSeeder::class);
+        Thread::factory()->count(10)->create();
     }
 }
