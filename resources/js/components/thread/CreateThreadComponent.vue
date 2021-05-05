@@ -43,6 +43,13 @@
                 chips
                 show-size
             ></v-file-input>
+
+            <div class="mt-16 grey--text text--darken-1" >
+                <v-icon class="mb-1"  color="green lighten-3">mdi-information-outline</v-icon>
+                スレッドは削除できません(スレッド内の書き込みは編集・削除可)。
+            </div >
+
+
         </v-form>
 
         <v-divider></v-divider>

@@ -1,7 +1,11 @@
 <template>
     <div>
-        <!-- ソート -->
-        <sort-component></sort-component>
+        <div class="d-flex justify-end">
+            <headline-component v-bind:headline="headline"></headline-component>
+            <v-spacer></v-spacer>
+            <!-- 子コンポーネントからのemit受け取り @イベント名="メソッド名" -->
+            <sort-component @receiveSortObject="updateSort"></sort-component>
+        </div>
 
         <!-- スレッド一覧 -->
         <div v-for="thread in threads" :key="thread.id">
@@ -10,42 +14,50 @@
                 v-bind:thread="thread"
             ></thread-object-component>
         </div>
-
-        <!-- ページネーション -->
-        <template>
-            <div class="text-center">
-                <v-pagination
-                    v-model="page"
-                    :length="15"
-                    :total-visible="7"
-                ></v-pagination>
-            </div>
-        </template>
     </div>
 </template>
 
 <script>
 // コンポーネントをインポート
-import ThreadObjectComponent from "./ThreadObjectComponent.vue";
+import HeadlineComponent from "../common/HeadlineComponent.vue";
 import SortComponent from "./SortComponent";
+import ThreadObjectComponent from "./ThreadObjectComponent.vue";
 
 export default {
     data() {
         return {
             threads: [],
-            page: 10
+            headline: "スレッド一覧",
+            received_sort_object: {}
         };
     },
     methods: {
+        updateSort(emited_sort_object) {
+            console.log("this is updateSort");
+            this.received_sort_object = emited_sort_object;
+            console.log(this.received_sort_object);
+
+            //他のスレッドはthis.threadName()で実行できる
+            this.getThreads();
+        },
         getThreads() {
-            axios.get("/api/threads/").then(res => {
-                this.threads = res.data;
-            });
+            console.log("this is getThreads");
+            axios
+                .get("/api/threads", {
+                    params: {
+                        sort: this.received_sort_object.sort,
+                        order: this.received_sort_object.order
+                    }
+                })
+                .then(res => {
+                    this.threads = res.data;
+                });
         }
     },
     components: {
-        ThreadObjectComponent,
-        SortComponent
+        HeadlineComponent,
+        SortComponent,
+        ThreadObjectComponent
     },
     mounted() {
         this.getThreads();

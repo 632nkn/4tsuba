@@ -25,10 +25,9 @@ class ThreadFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'title' => $this->faker->realText(30),
-            'image_id' => $this->faker->numberBetween(10, 100),
-            'post_count' => $this->faker->numberBetween(10, 100),
-            'like_count' => $this->faker->numberBetween(10, 100)
+            'title' => $this->faker->realText(60),
+            'post_count' => $this->faker->numberBetween(10, 1000),
+            'like_count' => $this->faker->numberBetween(10, 1000)
         ];
     }
 }

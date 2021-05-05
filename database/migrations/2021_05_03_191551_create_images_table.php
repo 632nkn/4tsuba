@@ -16,16 +16,17 @@ class CreateImagesTable extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id();
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
-            $table->unsignedBigInteger('thread_id')->comment('スレッドID(サムネイル画像)')->default(1);
-            $table->unsignedBigInteger('post_id')->comment('ポストID')->default(1);
-            $table->string('image_name', 100)->comment('画像名');
-            $table->unsignedInteger('image_size(Byte)')->comment('画像サイズ(Byte)')->default(0);
-
-            //外部キー制約
-            $table->foreign('thread_id')->references('id')->on('threads')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade')->onUpdate('cascade');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            //外部キー付き
+            $table->foreignId('thread_id')->comment('スレッドID')->default(1)
+                ->constrained()->onDelete('restrict')->onUpdate('restrict');
+            //外部キー付き
+            $table->foreignId('post_id')->comment('ポストID')->default(1)
+                ->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->string('image_name', 100)->comment('画像名')->default('example.jqg');
+            $table->unsignedInteger('image_size')->comment('画像サイズ')->default(0);
+            $table->boolean('is_edited')->comment('編集済みか')->storedAs('case when created_at = updated_at then 0 else 1 end');
         });
     }
 
