@@ -179,15 +179,14 @@ export default {
             ],
             nav_lists: [
                 {
-                    name: "スレッド作成",
-                    icon: "mdi-plus-thick",
-                    link: "/create-thread"
-                },
-
-                {
                     name: "スレッド一覧",
                     icon: "mdi-clipboard-text-multiple",
                     link: "/threads"
+                },
+                {
+                    name: "スレッド作成",
+                    icon: "mdi-plus-thick",
+                    link: "/create-thread"
                 },
                 {
                     name: "通知",
