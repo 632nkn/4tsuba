@@ -11,6 +11,7 @@ import TaskEditComponent from "./components/TaskEditComponent";
 import LoginComponent from "./components/LoginComponent";
 import CreateThreadComponent from "./components/thread/CreateThreadComponent";
 import ThreadsComponent from "./components/thread/ThreadsComponent";
+import ThreadShowComponent from "./components/thread/ThreadShowComponent";
 
 //URLと↑でimportしたコンポーネントをマッピングする（ルーティング設定
 const router = new VueRouter({
@@ -53,6 +54,13 @@ const router = new VueRouter({
             name: 'threads',
             component: ThreadsComponent,
          },
+         {
+            path: '/threads/:thread_id',
+            name: 'thread.show',
+            component: ThreadShowComponent,
+            props: true
+         },
+ 
 
 
 

@@ -89,13 +89,14 @@
         </v-navigation-drawer>
 
         <!-- ヘッダー -->
-        <v-app-bar color="green lighten-2" app dark flat clipped-left height="80">
+        <v-app-bar  color="green lighten-5" app flat outlined clipped-left height="80" class="green--text" >
             <v-toolbar-title>よつば</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field
                 class="mt-5"
                 append-outer-icon="mdi-magnify"
                 dense
+                color="green lighten-2"
                 label="書き込みに含まれる単語を検索"
                 placeholder="(渋谷 OR 代々木) ランチ"
                 hint="AND検索、OR検索に対応しています"

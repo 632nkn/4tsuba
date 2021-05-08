@@ -45,4 +45,10 @@ class ThreadController extends Controller
 
         return Thread::orderBy($order_set[0], $order_set[1])->get();
     }
+
+    public function show($thread_id)
+    {
+        //return Thread::orderBy($request->sort_column, $request->order)->get();
+        return Thread::find($thread_id);
+    }
 }

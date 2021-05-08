@@ -1,11 +1,5 @@
 <template>
-    <v-card
-        color="green lighten-4"
-        outlined
-        class="my-3"
-        :key="thread.title"
-        :to="'threads/' + thread.id"
-    >
+    <v-card color="green lighten-4" outlined class="my-3" :key="thread.title">
         <div class="d-flex">
             <v-avatar class="ma-3" size="80" tile>
                 <v-img :src="thread.src"></v-img>

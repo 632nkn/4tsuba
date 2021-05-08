@@ -35,3 +35,4 @@ Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 //クエリパラメータはルーティングに書かずとも$requestで取得できる
 //例.  /threads?sort=2?desc=1  は $request->sort $request->desc
 Route::get('/threads', [ThreadController::class, 'index']);
+Route::get('/threads/{thread}', [ThreadController::class, 'show']);

@@ -10,9 +10,17 @@
         <!-- スレッド一覧 -->
         <div v-for="thread in threads" :key="thread.id">
             <!-- 1つのスレッドを描画 -->
-            <thread-object-component
-                v-bind:thread="thread"
-            ></thread-object-component>
+            <router-link
+                style="text-decoration: none;"
+                v-bind:to="{
+                    name: 'thread.show',
+                    params: { thread_id: thread.id }
+                }"
+            >
+                <thread-object-component
+                    v-bind:thread="thread"
+                ></thread-object-component>
+            </router-link>
         </div>
     </div>
 </template>
