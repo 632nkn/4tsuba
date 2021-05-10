@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Route;
 //Laravel８式書き方
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ThreadController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ImageController;
+
+use App\Http\Controllers\LoginController;
 
 
 /*
@@ -20,9 +24,13 @@ use App\Http\Controllers\ThreadController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout']);
+
 
 //タスク
 Route::get('/tasks', [TaskController::class, 'index']);
@@ -34,5 +42,10 @@ Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 //thread
 //クエリパラメータはルーティングに書かずとも$requestで取得できる
 //例.  /threads?sort=2?desc=1  は $request->sort $request->desc
-Route::get('/threads', [ThreadController::class, 'index']);
-Route::get('/threads/{thread}', [ThreadController::class, 'show']);
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/threads', [ThreadController::class, 'index']);
+    Route::get('/threads/{thread_id}', [ThreadController::class, 'show']);
+    Route::post('/threads', [ThreadController::class, 'store']);
+    Route::get('/posts/all/{thread_id}', [PostController::class, 'index']);
+});

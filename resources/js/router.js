@@ -8,15 +8,30 @@ import TaskListComponent from "./components/TaskListComponent";
 import TaskShowComponent from "./components/TaskShowComponent";
 import TaskCreateComponent from "./components/TaskCreateComponent";
 import TaskEditComponent from "./components/TaskEditComponent";
-import LoginComponent from "./components/LoginComponent";
 import CreateThreadComponent from "./components/thread/CreateThreadComponent";
 import ThreadsComponent from "./components/thread/ThreadsComponent";
 import ThreadShowComponent from "./components/thread/ThreadShowComponent";
+
+import LoginComponent from "./components/LoginComponent";
+import LogoutComponent from "./components/LogoutComponent";
+
 
 //URLと↑でimportしたコンポーネントをマッピングする（ルーティング設定
 const router = new VueRouter({
     mode: 'history',
     routes: [
+      {
+         path: '/login',
+         name: 'login',
+         component: LoginComponent,
+         meta: {forGuest: true }
+      },
+      {
+         path: '/logout',
+         name: 'logout',
+         component: LogoutComponent,
+      },
+
         {
             path: '/tasks',
             name: 'task.list',
@@ -39,11 +54,6 @@ const router = new VueRouter({
            component: TaskEditComponent,
            props: true
         },
-        {
-            path: '/login',
-            name: 'login',
-            component: LoginComponent,
-         },
          {
             path: '/create-thread',
             name: 'create-thread',
@@ -60,12 +70,64 @@ const router = new VueRouter({
             component: ThreadShowComponent,
             props: true
          },
- 
-
-
-
-   ]
+   ] 
    
 });
+
+function isLoggedIn() {
+   return localStorage.getItem("auth");
+}
+
+// router.beforeEach((to, from, next) => {
+//    if (to.matched.some(record => record.meta.authOnly)) {
+//        if (!isLoggedIn()) {
+//            next("/login");
+//        } else {
+//            next();
+//        }
+//    } else if (to.matched.some(record => record.meta.guestOnly)) {
+//        if (isLoggedIn()) {
+//            next("/about");
+//        } else {
+//            next();
+//        }
+//    } else {
+//        next();
+//    }
+// });
+
+// router.beforeEach((to, from, next) => {
+//    // isPublic でない場合(=認証が必要な場合)、かつ、ログインしていない場合
+//    if (to.matched.some(record => !record.meta.isPublic) && !isLoggedIn()) {
+//      next({ path: '/login', query: { redirect: to.fullPath }});
+//    } else {
+//      next();
+//    }
+//  });
+
+router.beforeEach((to, from, next) => {
+   //forGuestがついてないURLへのアクセス
+   if (to.matched.some(record => !(record.meta.forGuest))) {
+       if (!isLoggedIn()) {
+          alert('ログインが必要です。');
+           next("/login");
+       } else {
+          next();
+       }
+   //forGuestがついているURLへのアクセス
+   } else if (to.matched.some(record => record.meta.forGuest)) {
+       if (isLoggedIn()) {
+           alert('すでにログイン済みです。');
+           next("/threads");
+       } else {
+           next();
+       }
+   } else {
+           next();
+       }
+});
+
+
+
 
 export default router;

@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Thread;
+//authを使用する
+use Illuminate\Support\Facades\Auth;
 
 
 class ThreadController extends Controller
 {
+    //スレッド取得
     public function index(Request $request)
     {
-        //return Thread::orderBy($request->sort_column, $request->order)->get();
-
         $sort_list = array("最終更新", "作成日時", "書込数", "いいね数");
         $order_set = array();
 
@@ -46,9 +47,27 @@ class ThreadController extends Controller
         return Thread::orderBy($order_set[0], $order_set[1])->get();
     }
 
+    //★個別スレッド show
     public function show($thread_id)
     {
-        //return Thread::orderBy($request->sort_column, $request->order)->get();
         return Thread::find($thread_id);
+    }
+
+    //スレッド store
+    public function store(Request $request)
+    {
+        $thread = Thread::create([
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+        ]);
+
+        //リクエストにスレッドidを追加
+        $request->merge([
+            'thread_id' => $thread->id,
+            'displayed_post_id' => 1,
+        ]);
+
+        $post_controller = new PostController();
+        $post_controller->store($request);
     }
 }

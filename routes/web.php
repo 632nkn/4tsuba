@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,6 +19,15 @@ use Illuminate\Support\Facades\Route;
 
 //laravel-log-viewer
 Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+
+Route::get('/', function () {
+    // return view('welcome');
+    $user = Auth::loginUsingId(23);
+
+    $token = $user->createToken('test');
+
+    dd($token);
+});
 
 Route::get('/{any}', function () {
     return view('app');

@@ -1,5 +1,5 @@
 <template>
-    <v-card color="green lighten-4" outlined class="my-3" :key="thread.title">
+    <v-card color="green lighten-4" outlined class="my-3">
         <div class="d-flex">
             <v-avatar class="ma-3" size="80" tile>
                 <v-img :src="thread.src"></v-img>

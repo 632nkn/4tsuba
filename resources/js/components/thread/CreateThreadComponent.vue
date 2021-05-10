@@ -44,12 +44,12 @@
                 show-size
             ></v-file-input>
 
-            <div class="mt-16 grey--text text--darken-1" >
-                <v-icon class="mb-1"  color="green lighten-3">mdi-information-outline</v-icon>
+            <div class="mt-16 grey--text text--darken-1">
+                <v-icon class="mb-1" color="green lighten-3"
+                    >mdi-information-outline</v-icon
+                >
                 スレッドは削除できません(スレッド内の書き込みは編集・削除可)。
-            </div >
-
-
+            </div>
         </v-form>
 
         <v-divider></v-divider>
@@ -99,15 +99,27 @@ export default {
     methods: {
         submit() {
             const result = this.$refs.form.validate();
-            console.log("submit", result);
+            console.log("入力内容バリデーション" + result);
             console.log(this.thread.title);
             console.log(this.thread.body);
             console.log(this.thread.image);
-        },
-        submit2() {
-            axios.post("/api/threads", this.thread).then(res => {
-                this.$router.push({ name: "task.list" });
-            });
+
+            const form_data = new FormData();
+            form_data.append("title", this.thread.title);
+            form_data.append("body", this.thread.body);
+            form_data.append("image", this.thread.image);
+
+            axios
+                .post("/api/threads", form_data, {
+                    headers: { "content-type": "multipart/form-data" }
+                })
+                .then(response => {
+                    console.log(response);
+                    this.$router.push({ name: "threads" });
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                });
         }
     }
 };
