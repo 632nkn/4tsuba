@@ -22,7 +22,7 @@ class PostController extends Controller
         $post = Post::create([
             'user_id' => Auth::id(),
             'thread_id' => $request->thread_id,
-            'displayed_post_id' => $request->displayed_post_id,
+            'displayed_post_id' => $this->returnPostCount($request->thread_id) + 1,
             'body' => $request->body,
             'has_image' => $request->hasFile('image'),
         ]);
@@ -46,5 +46,11 @@ class PostController extends Controller
     {
         $posts = Post::with(['image', 'user'])->where('thread_id', $thread_id)->get();
         return $posts;
+    }
+
+    public function returnPostCount($thread_id)
+    {
+        $post_count = Post::where('thread_id', $thread_id)->count();
+        return $post_count;
     }
 }

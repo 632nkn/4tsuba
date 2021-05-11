@@ -20,7 +20,7 @@
             v-model="true_false"
             class="ml-3"
             @click="
-                changeHint();
+                switchHint();
                 changeSort();
             "
         ></v-checkbox>
@@ -41,7 +41,7 @@ export default {
         };
     },
     methods: {
-        changeHint() {
+        switchHint() {
             this.order = this.order.reverse();
             console.log(this.order);
         },

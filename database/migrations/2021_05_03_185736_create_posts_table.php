@@ -24,7 +24,7 @@ class CreatePostsTable extends Migration
                 ->constrained()->onDelete('set null')->onUpdate('cascade');
             //外部キー付き
             $table->foreignId('thread_id')->comment('スレッドID')->default(1)
-                ->constrained()->onDelete('restrict')->onUpdate('restrict');
+                ->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedBigInteger('displayed_post_id')->comment('スレッド内ポストID')->default(1);
             $table->string('body', 1000)->comment('本文')->default('本文なし');
             $table->boolean('has_image')->comment('画像があるか')->default(false);

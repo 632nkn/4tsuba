@@ -139,9 +139,6 @@
             </v-card>
         </v-main>
 
-        <v-footer color="primary" dark app>
-            Vuetify
-        </v-footer>
     </v-app>
 </template>
 

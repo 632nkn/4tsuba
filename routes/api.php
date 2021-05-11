@@ -10,7 +10,7 @@ use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ImageController;
 
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\AuthController;
 
 
 /*
@@ -28,8 +28,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout']);
+Route::get('/test/{thread_id}', [PostController::class, 'returnPostCount']);
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
 
 //タスク
@@ -44,8 +47,12 @@ Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 //例.  /threads?sort=2?desc=1  は $request->sort $request->desc
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    //users
+    //threads
     Route::get('/threads', [ThreadController::class, 'index']);
     Route::get('/threads/{thread_id}', [ThreadController::class, 'show']);
     Route::post('/threads', [ThreadController::class, 'store']);
-    Route::get('/posts/all/{thread_id}', [PostController::class, 'index']);
+    //posts
+    Route::get('/posts/thread/{thread_id}', [PostController::class, 'index']);
+    Route::post('posts/', [PostController::class, 'store']);
 });

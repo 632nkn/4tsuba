@@ -64,7 +64,6 @@ class ThreadController extends Controller
         //リクエストにスレッドidを追加
         $request->merge([
             'thread_id' => $thread->id,
-            'displayed_post_id' => 1,
         ]);
 
         $post_controller = new PostController();

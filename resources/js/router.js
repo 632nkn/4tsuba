@@ -10,16 +10,23 @@ import TaskCreateComponent from "./components/TaskCreateComponent";
 import TaskEditComponent from "./components/TaskEditComponent";
 import CreateThreadComponent from "./components/thread/CreateThreadComponent";
 import ThreadsComponent from "./components/thread/ThreadsComponent";
-import ThreadShowComponent from "./components/thread/ThreadShowComponent";
+import PostsComponent from "./components/post/PostsComponent";
 
-import LoginComponent from "./components/LoginComponent";
-import LogoutComponent from "./components/LogoutComponent";
+import RegisterComponent from "./components/user/RegisterComponent";
+import LoginComponent from "./components/user/LoginComponent";
+import LogoutComponent from "./components/user/LogoutComponent";
 
 
 //URLと↑でimportしたコンポーネントをマッピングする（ルーティング設定
 const router = new VueRouter({
     mode: 'history',
     routes: [
+      {
+         path: '/register',
+         name: 'register',
+         component: RegisterComponent,
+         meta: {forGuest: true }
+      },      
       {
          path: '/login',
          name: 'login',
@@ -67,7 +74,7 @@ const router = new VueRouter({
          {
             path: '/threads/:thread_id',
             name: 'thread.show',
-            component: ThreadShowComponent,
+            component: PostsComponent,
             props: true
          },
    ] 

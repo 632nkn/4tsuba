@@ -20,7 +20,7 @@ class CreateImagesTable extends Migration
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             //外部キー付き
             $table->foreignId('thread_id')->comment('スレッドID')->default(1)
-                ->constrained()->onDelete('restrict')->onUpdate('restrict');
+                ->constrained()->onDelete('cascade')->onUpdate('cascade');
             //外部キー付き
             $table->foreignId('post_id')->comment('ポストID')->default(1)
                 ->constrained()->onDelete('cascade')->onUpdate('cascade');
