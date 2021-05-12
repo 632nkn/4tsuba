@@ -20,10 +20,10 @@ class CreateResponsesTable extends Migration
             //外部キー付き
             $table->foreignId('thread_id')->comment('スレッドID')->default(1)
                 ->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->unsignedBigInteger('origin_d_post_id')->comment('返信元表示上ポストID')->nullable()->default(null);
-            $table->unsignedBigInteger('destination_d_post_id')->comment('返信先表示上ポストID')->nullable()->default(null);
+            $table->unsignedBigInteger('origin_d_post_id')->comment('返信元表示上ポストID')->default(null);
+            $table->unsignedBigInteger('dest_d_post_id')->comment('返信先表示上ポストID')->default(null);
             //複合uniqueキー
-            $table->unique(['thread_id', 'origin_d_post_id', 'destination_d_post_id']);
+            $table->unique(['thread_id', 'origin_d_post_id', 'dest_d_post_id']);
         });
     }
 

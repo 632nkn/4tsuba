@@ -9,6 +9,9 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\ResponseController;
+
 
 use App\Http\Controllers\AuthController;
 
@@ -48,11 +51,16 @@ Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     //users
-    //threads
-    Route::get('/threads', [ThreadController::class, 'index']);
-    Route::get('/threads/{thread_id}', [ThreadController::class, 'show']);
-    Route::post('/threads', [ThreadController::class, 'store']);
-    //posts
-    Route::get('/posts/thread/{thread_id}', [PostController::class, 'index']);
-    Route::post('posts/', [PostController::class, 'store']);
 });
+//開発のため一旦外だし
+//threads
+Route::get('/threads', [ThreadController::class, 'index']);
+Route::get('/threads/{thread_id}', [ThreadController::class, 'show']);
+Route::post('/threads', [ThreadController::class, 'store']);
+//posts
+Route::get('/posts/thread/{thread_id}', [PostController::class, 'index']);
+Route::post('/posts', [PostController::class, 'store']);
+
+//like
+Route::put('/like', [LikeController::class, 'store']);
+Route::delete('/like', [LikeController::class, 'destroy']);

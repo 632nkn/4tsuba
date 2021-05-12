@@ -77,6 +77,13 @@ const router = new VueRouter({
             component: PostsComponent,
             props: true
          },
+         {
+            path: '/threads/:thread_id/responses/:displayed_post_id',
+            name: 'thread.responses',
+            component: PostsComponent,
+            props: true
+         },
+
    ] 
    
 });

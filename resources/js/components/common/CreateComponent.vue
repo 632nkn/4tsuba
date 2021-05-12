@@ -61,7 +61,7 @@
                 class="white--text"
                 color="green lighten-2"
                 depressed
-                @click="submit"
+                @click="emit"
             >
                 {{button_message[0]}}
             </v-btn>
@@ -77,15 +77,11 @@ export default {
             type: String,
             default: "post",
         },
-        thread_id: {
-            type: Number,
-            default: 1
-        }
     },
     data: function() {
         return {
             //入力項目
-            input: {},
+            input: {title: null, body: null, image: null},
             //バリデーション関連
             limit: { title: 10, body: 20 },
             valid: null,
@@ -105,45 +101,22 @@ export default {
         };
     },
     methods: {
-        submit() {
+        emit() {
             const result = this.$refs.form.validate();
             console.log("入力内容バリデーション " + result);
-            console.log(this.input.title);
-            console.log(this.input.body);
-            console.log(this.input.image);
+            console.log(this.input);
 
             const form_data = new FormData();
             form_data.append("body", this.input.body);
             form_data.append("image", this.input.image);
 
             if(this.thread_or_post === 'thread') {
-            form_data.append("title", this.input.title);
-            axios
-                .post("/api/threads", form_data, {
-                    headers: { "content-type": "multipart/form-data" }
-                })
-                .then(response => {
-                    console.log(response);
-                    console.log('スレッド作成');
-                    this.$router.push({ name: "threads" });
-                })
-                .catch(error => {
-                    console.log(error.response.data);
-                });
-            } else {
-            form_data.append("thread_id", this.thread_id);
-              axios
-                .post("/api/posts", form_data, {
-                    headers: { "content-type": "multipart/form-data" }
-                })
-                .then(response => {
-                    console.log(response);
-                    console.log('書き込み作成');
-                })
-                .catch(error => {
-                    console.log(error.response.data);
-                });
+                form_data.append("title", this.input.title);
             }
+
+            this.$emit("receiveInput", form_data);
+            this.input.body = null;
+            this.input.image = null;
         },
         switchWords() {
             if(this.thread_or_post === 'thread') {
@@ -151,7 +124,7 @@ export default {
                 this.button_message = this.button_message.reverse();
                 this.body_label = this.body_label.reverse();
             }
-        }
+        },
 
     },
     mounted() {

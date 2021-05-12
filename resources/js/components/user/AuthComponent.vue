@@ -72,7 +72,7 @@
                     >mdi-information-outline</v-icon
                 >
                 <router-link v-bind:to="{ name: link[0] }">
-                    {{ notice[0] }}はこちら
+                    {{ title[1] }}はこちら
                 </router-link>
             </div>
         </v-card>
@@ -117,7 +117,6 @@ export default {
                 }
             },
             title: ["ログイン", "ユーザー登録"],
-            notice: ["アカウント作成", "ログイン"],
             link: ["register", "login"]
         };
     },
@@ -171,7 +170,6 @@ export default {
         switchWords() {
             if (this.register_or_login === "register") {
                 this.title = this.title.reverse();
-                this.notice = this.notice.reverse();
                 this.link = this.link.reverse();
             }
         }

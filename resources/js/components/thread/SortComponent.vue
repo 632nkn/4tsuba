@@ -46,8 +46,8 @@ export default {
             console.log(this.order);
         },
         changeSort() {
-            this.sort_object.sort = this.selected_sort;
-            this.sort_object.order = this.order[0];
+            this.$set(this.sort_object, 'sort', this.selected_sort);
+            this.$set(this.sort_object, 'order', this.order[0]);
             console.log(this.sort_object);
 
             //親コンポーネントへのemit  第一引数は親コンポーネントで受け取るためのイベント名

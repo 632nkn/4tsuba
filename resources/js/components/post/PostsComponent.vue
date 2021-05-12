@@ -12,7 +12,7 @@
 
         <v-divider></v-divider>
         <!-- 書き込み部分 -->
-        <create-component :thread_id="thread_id"></create-component>
+        <create-component @receiveInput="post"></create-component>
     </div>
 </template>
 
@@ -29,12 +29,16 @@ export default {
             type: Number,
             default: 1,
             required: true
+        },
+        dest_d_post_id: {
+            type: Number,
+            default: 1,
         }
     },
     data() {
         return {
             thread: {},
-            posts: {}
+            posts: {},
         };
     },
     methods: {
@@ -49,7 +53,31 @@ export default {
             axios.get("/api/posts/thread/" + this.thread_id).then(res => {
                 this.posts = res.data;
             });
-        }
+        },
+        post(emited_form_data) {
+            
+            const form_data = emited_form_data;
+            form_data.append("thread_id", this.thread_id);
+            console.log('this is post');
+            for (let value of form_data.entries()) { 
+                console.log(value);
+            }
+            
+            axios
+            .post("/api/posts", form_data, {
+                headers: { "content-type": "multipart/form-data" }
+            })
+            .then(response => {
+                console.log(response);
+                console.log('書き込み作成');
+
+                //書き込み再描画
+                this.getPosts();
+            })
+            .catch(error => {
+                console.log(error.response.data);
+            });
+        } 
     },
     components: {
         ThreadObjectComponent,

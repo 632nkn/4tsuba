@@ -29,4 +29,14 @@ class Post extends Model
     {
         return $this->hasOne(Image::class);
     }
+    public function likes()
+    {
+        return $this->hasMany(like::class);
+    }
+
+    //呼び出しメソッド
+    public function returnMaxDisplayedPostId($thread_id)
+    {
+        return $this->where('thread_id', $thread_id)->count();
+    }
 }

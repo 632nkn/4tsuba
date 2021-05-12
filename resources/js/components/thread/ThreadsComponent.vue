@@ -45,7 +45,7 @@ export default {
             this.received_sort_object = emited_sort_object;
             console.log(this.received_sort_object);
 
-            //他のスレッドはthis.threadName()で実行できる
+            //他のメソッドはthis.methodName()で実行できる
             this.getThreads();
         },
         getThreads() {

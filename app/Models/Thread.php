@@ -39,4 +39,20 @@ class Thread extends Model
     {
         return $this->hasMany(Image::class);
     }
+
+    public function responses()
+    {
+        return $this->hasMany(Response::class);
+    }
+
+    //呼び出しメソッド
+    public function incrementLikeCount($id)
+    {
+        $this->find($id)->increment('like_count');
+    }
+
+    public function decrementLikeCount($id)
+    {
+        $this->find($id)->decrement('like_count');
+    }
 }
