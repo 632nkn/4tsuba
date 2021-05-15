@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 //Laravel８式書き方
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ImageController;
@@ -26,7 +27,8 @@ use App\Http\Controllers\AuthController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+//検証
+Route::get('/user/check', [AuthController::class, 'checkLoginOrNot']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -45,14 +47,18 @@ Route::post('/tasks', [TaskController::class, 'store']);
 Route::put('/tasks/{task}', [TaskController::class, 'update']);
 Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 
-//thread
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    //auth sanctum 通すURLはこの中入れる
+});
+//開発のため一旦外だし
+// --------------------------------------------------------------------
 //クエリパラメータはルーティングに書かずとも$requestで取得できる
 //例.  /threads?sort=2?desc=1  は $request->sort $request->desc
 
-Route::group(['middleware' => ['auth:sanctum']], function () {
-    //users
-});
-//開発のため一旦外だし
+//users
+Route::get('/users/id', [AuthController::class, 'returnUserId']);
+
 //threads
 Route::get('/threads', [ThreadController::class, 'index']);
 Route::get('/threads/{thread_id}', [ThreadController::class, 'show']);
@@ -60,7 +66,12 @@ Route::post('/threads', [ThreadController::class, 'store']);
 //posts
 Route::get('/posts/thread/{thread_id}', [PostController::class, 'index']);
 Route::post('/posts', [PostController::class, 'store']);
+Route::delete('/posts', [PostController::class, 'destroy']);
+//images
+Route::get('/images/threads', [ImageController::class, 'returnThreadImages']);
+
 
 //like
 Route::put('/like', [LikeController::class, 'store']);
 Route::delete('/like', [LikeController::class, 'destroy']);
+// --------------------------------------------------------------------

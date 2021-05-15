@@ -30,8 +30,9 @@ class CreatePostsTable extends Migration
             $table->boolean('has_image')->comment('画像があるか')->default(false);
             $table->boolean('is_edited')->comment('編集済みか')->storedAs('case when created_at = updated_at then 0 else 1 end');
 
-            //複合uniqueキー(ソフトデリートするので、deleted_atを含む必要がある)
-            $table->unique(['thread_id', 'displayed_post_id', 'deleted_at']);
+            //複合uniqueキー(ソフトデリートするが、「削除されました」状態でスレッド内IDを表示する。
+            //そのため、スレッド内IDは重複してはいけないため、deleted_atを含まない)
+            $table->unique(['thread_id', 'displayed_post_id']);
             //外部キー古い書き方
             //$table->foreign('thread_id')->references('id')->on('threads')->onDelete('cascade')->onUpdate('cascade');
         });

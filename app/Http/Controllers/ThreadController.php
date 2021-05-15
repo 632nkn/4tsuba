@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Thread;
+use App\Models\Image;
 //authを使用する
 use Illuminate\Support\Facades\Auth;
 
@@ -13,6 +14,10 @@ class ThreadController extends Controller
     //スレッド取得
     public function index(Request $request)
     {
+
+        $image = new Image();
+        $thread_image_table = $image->returnThreadImageTable();
+
         $sort_list = array("最終更新", "作成日時", "書込数", "いいね数");
         $order_set = array();
 
@@ -44,13 +49,24 @@ class ThreadController extends Controller
                 array_push($order_set, 'desc');
         }
 
-        return Thread::orderBy($order_set[0], $order_set[1])->get();
+        return Thread::select('*')
+            ->leftJoinSub($thread_image_table, 'thread_image_table', function ($join) {
+                $join->on('threads.id', '=', 'thread_image_table.thread_id');
+            })
+            ->orderBy('threads.' . $order_set[0], $order_set[1])->get();
     }
 
     //★個別スレッド show
     public function show($thread_id)
     {
-        return Thread::find($thread_id);
+        $image = new Image();
+        $thread_image_table = $image->returnThreadImageTable();
+
+        return Thread
+            ::leftJoinSub($thread_image_table, 'thread_image_table', function ($join) {
+                $join->on('threads.id', '=', 'thread_image_table.thread_id');
+            })
+            ->find($thread_id);
     }
 
     //スレッド store

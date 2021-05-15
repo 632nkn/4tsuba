@@ -9,6 +9,22 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+
+    public function checkLoginOrNot()
+    {
+        return Auth::check();
+        // if (Auth::check()) {
+        //     return response()->json(['is_login' => 1]);
+        // } else {
+        //     return response()->json(['is_login' => 0]);
+        // }
+    }
+
+    public function returnUserId()
+    {
+        return Auth::id();
+    }
+
     public function login(Request $request)
     {
         $request->validate([

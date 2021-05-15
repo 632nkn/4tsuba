@@ -1,8 +1,5 @@
 <template>
     <div class="p-5">
-        <button class="btn btn-success mb-3" @click="getUser">
-            ユーザ情報取得
-        </button>
         <v-card flat>
             <v-toolbar class="green--text text--lighten-1" flat>
                 <v-toolbar-title>{{ title[0] }}</v-toolbar-title>
@@ -156,16 +153,6 @@ export default {
                         });
                 }
             });
-        },
-        getUser() {
-            axios
-                .get("/api/user")
-                .then(response => {
-                    console.log(response.data);
-                })
-                .catch(error => {
-                    alert(error.response.data.message);
-                });
         },
         switchWords() {
             if (this.register_or_login === "register") {

@@ -89,7 +89,7 @@
         </v-navigation-drawer>
 
         <!-- ヘッダー -->
-        <v-app-bar  color="green lighten-5" app flat outlined clipped-left height="80" class="green--text" >
+        <v-app-bar  color="white" app flat outlined clipped-left height="80" class="green--text" >
             <v-toolbar-title>よつば</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-text-field
@@ -135,6 +135,7 @@
         <!-- コンテンツ表示位置 -->
         <v-main>
             <v-card max-width="800" class="mx-2 mt-6" flat>
+            <confirm-login-component></confirm-login-component>
             <router-view />
             </v-card>
         </v-main>
@@ -143,6 +144,7 @@
 </template>
 
 <script>
+import ConfirmLoginComponent from "../user/ConfirmLoginComponent.vue";
 export default {
     data() {
         return {
@@ -233,6 +235,9 @@ export default {
     },
     destroyed() {
         window.removeEventListener("resize", this.handleResize);
+    },
+    components: {
+        ConfirmLoginComponent,
     }
 };
 </script>

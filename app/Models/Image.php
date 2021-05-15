@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+
+
 
 class Image extends Model
 {
@@ -19,5 +22,18 @@ class Image extends Model
     public function post()
     {
         return $this->belongsTo(Post::class);
+    }
+
+    //呼び出しメソッド
+    public function returnThreadImageTable()
+    {
+        return $this->select(
+            'id as image_id',
+            'thread_id',
+            'image_name',
+            'image_size'
+        )->whereIn('id', function ($query) {
+            $query->select(DB::raw('min(id)'))->from('images')->groupBy('thread_id');
+        })->orderBy('thread_id', 'asc');
     }
 }

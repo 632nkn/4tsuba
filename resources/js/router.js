@@ -92,32 +92,6 @@ function isLoggedIn() {
    return localStorage.getItem("auth");
 }
 
-// router.beforeEach((to, from, next) => {
-//    if (to.matched.some(record => record.meta.authOnly)) {
-//        if (!isLoggedIn()) {
-//            next("/login");
-//        } else {
-//            next();
-//        }
-//    } else if (to.matched.some(record => record.meta.guestOnly)) {
-//        if (isLoggedIn()) {
-//            next("/about");
-//        } else {
-//            next();
-//        }
-//    } else {
-//        next();
-//    }
-// });
-
-// router.beforeEach((to, from, next) => {
-//    // isPublic でない場合(=認証が必要な場合)、かつ、ログインしていない場合
-//    if (to.matched.some(record => !record.meta.isPublic) && !isLoggedIn()) {
-//      next({ path: '/login', query: { redirect: to.fullPath }});
-//    } else {
-//      next();
-//    }
-//  });
 
 router.beforeEach((to, from, next) => {
    //forGuestがついてないURLへのアクセス

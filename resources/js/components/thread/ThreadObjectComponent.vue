@@ -2,7 +2,15 @@
     <v-card color="green lighten-4" outlined class="my-3">
         <div class="d-flex">
             <v-avatar class="ma-3" size="80" tile>
-                <v-img :src="thread.src"></v-img>
+                <!-- vueのルート publicディレクトリからの相対パスを記入する この場合 public/storage/images/example.png -->
+                <img v-if="thread.image_name"
+                    :src="'/storage/images/' + thread.image_name"
+                    style="object-fit: cover;"
+                />
+                <img v-else
+                    src="/storage/images/noimage.jpg"
+                    style="object-fit: cover;"
+                />
             </v-avatar>
             <div>
                 <v-card-title v-html="thread.title"></v-card-title>

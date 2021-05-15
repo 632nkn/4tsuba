@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Thread extends Model
 {
     use HasFactory;
-    //ソフトデリートを有効にするために追加
-    use SoftDeletes;
 
     protected $fillable = ['user_id', 'title', 'post_count', 'like_count'];
 
@@ -46,13 +44,4 @@ class Thread extends Model
     }
 
     //呼び出しメソッド
-    public function incrementLikeCount($id)
-    {
-        $this->find($id)->increment('like_count');
-    }
-
-    public function decrementLikeCount($id)
-    {
-        $this->find($id)->decrement('like_count');
-    }
 }

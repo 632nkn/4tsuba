@@ -6,13 +6,22 @@
         ></thread-object-component>
 
         <!-- ポスト部分 -->
-        <div v-for="post in posts" :key="post.id">
-            <post-object-component v-bind:post="post"> </post-object-component>
+        <div v-for="(post, index) in posts" :key="post.id">
+            <post-object-component 
+                v-bind:post="post"
+                v-bind:index="index"
+                v-bind:user_id="user_id"
+                @receiveIndex="deletePost"
+
+            >
+            </post-object-component>
         </div>
 
         <v-divider></v-divider>
         <!-- 書き込み部分 -->
-        <create-component @receiveInput="post"></create-component>
+        <create-component
+            @receiveInput="createPost"
+        ></create-component>
     </div>
 </template>
 
@@ -37,11 +46,18 @@ export default {
     },
     data() {
         return {
+            user_id: null,
             thread: {},
             posts: {},
         };
     },
     methods: {
+        getUserId() {
+            console.log("this is getUserId");
+            axios.get("/api/users/id").then(res => {
+                this.user_id = res.data;
+            });
+        },
         getThread() {
             console.log("this is getThread");
             axios.get("/api/threads/" + this.thread_id).then(res => {
@@ -54,7 +70,7 @@ export default {
                 this.posts = res.data;
             });
         },
-        post(emited_form_data) {
+        createPost(emited_form_data) {
             
             const form_data = emited_form_data;
             form_data.append("thread_id", this.thread_id);
@@ -77,7 +93,14 @@ export default {
             .catch(error => {
                 console.log(error.response.data);
             });
-        } 
+        },
+        deletePost(emited_index) {
+            console.log('this is deletePost');
+            console.log(emited_index);
+            console.log(this.posts[emited_index]);
+            this.posts[emited_index].deleted_at = 'deleted';
+        },
+
     },
     components: {
         ThreadObjectComponent,
@@ -85,6 +108,7 @@ export default {
         CreateComponent,
     },
     mounted() {
+        this.getUserId();
         this.getThread();
         this.getPosts();
     }

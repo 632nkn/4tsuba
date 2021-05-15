@@ -20,7 +20,6 @@ class CreateThreadsTable extends Migration
             $table->id();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-            $table->softDeletes();
             //外部キー付き
             $table->foreignId('user_id')->nullable()->comment('ユーザーID')->default(5)
                 ->constrained()->onDelete('set null')->onUpdate('cascade');

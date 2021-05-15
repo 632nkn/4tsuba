@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Thread;
 use App\Models\Response;
 
 //authを使用する
@@ -60,22 +61,40 @@ class PostController extends Controller
     {
         $response = new Response();
         $responded_count_table = $response->returnRespondedCountTable($thread_id);
+        $temp_post = new Post();
+        $login_user_post_table = $temp_post->returnLoginUserPostTable($thread_id);
 
 
-        $posts = Post::with(['image', 'user',])
-            ->where('thread_id', $thread_id)
+        //select(*)ないと外部結合した列がでなくなるので注意
+        $posts = Post::select('*')->with(['image', 'user',])->withTrashed()
+            ->where('thread_id', $thread_id)->whereNotNull('user_id')
             ->leftJoinSub($responded_count_table, 'responded_count_table', function ($join) {
                 $join->on('posts.displayed_post_id', '=', 'responded_count_table.dest_d_post_id');
             })
-            //withCount句を入れるとなぜかresponded_count列がでなくなる不具合
+            //  1がnullになるときがあるバグ
+            // ->leftJoinSub($login_user_post_table, 'login_user_post_table', function ($join) {
+            //     $join->on('posts.id', '=', 'login_user_post_table.login_user_posted_post_id');
+            // })
             ->withCount([
                 'likes',
                 'likes AS login_user_liked' => function ($query) {
                     $query->where('user_id', Auth::id());
-                }
+                },
             ])
-            ->orderBy('id', 'asc')->get();
+            ->orderBy('posts.id', 'asc')->get();
 
         return $posts;
+    }
+
+    //ポスト削除
+    public function destroy(Request $request)
+    {
+        Post::where('user_id', Auth::id())->where('id', $request->id)->delete();
+
+        $image_controller = new ImageController();
+        $image_controller->destroy($request->id);
+        //threadsテーブルのlike_countデクリメント
+        // $thread = new Thread();
+        // $thread->find($request->thread_id)->decrement('post_count');
     }
 }

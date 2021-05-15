@@ -20,7 +20,7 @@ class LikeController extends Controller
 
         //threadsテーブルのlike_countインクリメント
         $thread = new Thread();
-        $thread->incrementLikeCount($request->thread_id);
+        $thread->find($request->thread_id)->increment('like_count');
     }
 
     public function destroy(Request $request)
@@ -30,6 +30,6 @@ class LikeController extends Controller
 
         //threadsテーブルのlike_countデクリメント
         $thread = new Thread();
-        $thread->decrementLikeCount($request->thread_id);
+        $thread->find($request->thread_id)->decrement('like_count');
     }
 }

@@ -22,4 +22,9 @@ class ImageController extends Controller
             'image_size' => $uploaded_image->getSize(),
         ]);
     }
+
+    public function destroy($post_id)
+    {
+        Image::where('post_id', $post_id)->delete();
+    }
 }
