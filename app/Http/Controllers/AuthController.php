@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 
@@ -13,16 +14,35 @@ class AuthController extends Controller
     public function checkLoginOrNot()
     {
         return Auth::check();
-        // if (Auth::check()) {
-        //     return response()->json(['is_login' => 1]);
-        // } else {
-        //     return response()->json(['is_login' => 0]);
-        // }
     }
 
-    public function returnUserId()
+    public function returnMyId()
     {
         return Auth::id();
+    }
+
+    public function returnMyInfo()
+    {
+        return User::find(Auth::id());
+    }
+
+    public function checkPassword(Request $request)
+    {
+        $current_password = Auth::user()->password;
+        return (Hash::check($request->password, $current_password));
+    }
+
+    public function editPersonal(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'between:8,20'],
+        ]);
+
+        User::find(Auth::id())->update([
+            'email' => $request->email,
+            'password' => bcrypt($request->password)
+        ]);
     }
 
     public function login(Request $request)

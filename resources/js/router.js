@@ -8,13 +8,21 @@ import TaskListComponent from "./components/TaskListComponent";
 import TaskShowComponent from "./components/TaskShowComponent";
 import TaskCreateComponent from "./components/TaskCreateComponent";
 import TaskEditComponent from "./components/TaskEditComponent";
+//threads
 import CreateThreadComponent from "./components/thread/CreateThreadComponent";
 import ThreadsComponent from "./components/thread/ThreadsComponent";
+//posts
 import PostsComponent from "./components/post/PostsComponent";
-
-import RegisterComponent from "./components/user/RegisterComponent";
-import LoginComponent from "./components/user/LoginComponent";
-import LogoutComponent from "./components/user/LogoutComponent";
+//users
+import ProfileComponent from "./components/users/ProfileComponent.vue"
+//Auth
+import RegisterComponent from "./components/auth/RegisterComponent";
+import LoginComponent from "./components/auth/LoginComponent";
+import LogoutComponent from "./components/auth/LogoutComponent";
+//setting
+import SettingNameComponent from "./components/setting/SettingNameComponent";
+import SettingConfirmComponent from "./components/setting/SettingConfirmComponent";
+import SettingPersonalComponent from "./components/setting/SettingPersonalComponent";
 
 
 //URLと↑でimportしたコンポーネントをマッピングする（ルーティング設定
@@ -61,9 +69,10 @@ const router = new VueRouter({
            component: TaskEditComponent,
            props: true
         },
+        //threads
          {
-            path: '/create-thread',
-            name: 'create-thread',
+            path: '/threads/create',
+            name: 'threads/create',
             component: CreateThreadComponent,
          },
          {
@@ -83,6 +92,43 @@ const router = new VueRouter({
             component: PostsComponent,
             props: true
          },
+         //users
+         {
+            path: '/users/:user_id/posts',
+            name: 'user.posts',
+            component: ProfileComponent,
+            props: true
+         },
+         {
+            path: '/users/:user_id/likes',
+            name: 'user.likes',
+            component: ProfileComponent,
+            props: true
+         },
+         {
+            path: '/users/:user_id/threads',
+            name: 'user.threads',
+            component: ProfileComponent,
+            props: true
+         },
+         //setting
+         {
+            path: '/setting/account/name',
+            name: 'setting.name',
+            component: SettingNameComponent,
+         },
+         {
+            path: '/setting/account/confirm',
+            name: 'setting.confirm',
+            component: SettingConfirmComponent,
+         },
+         {
+            path: '/setting/account/personal',
+            name: 'setting.personal',
+            component: SettingPersonalComponent,
+         },
+
+
 
    ] 
    

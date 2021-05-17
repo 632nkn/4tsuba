@@ -26,7 +26,6 @@
 </template>
 
 <script>
-// コンポーネントをインポート
 import HeadlineComponent from "../common/HeadlineComponent.vue";
 import SortComponent from "./SortComponent";
 import ThreadObjectComponent from "./ThreadObjectComponent.vue";

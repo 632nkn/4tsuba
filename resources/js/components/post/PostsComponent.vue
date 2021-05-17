@@ -7,26 +7,21 @@
 
         <!-- ポスト部分 -->
         <div v-for="(post, index) in posts" :key="post.id">
-            <post-object-component 
+            <post-object-component
                 v-bind:post="post"
                 v-bind:index="index"
-                v-bind:user_id="user_id"
-                @receiveIndex="deletePost"
-
+                v-bind:my_id="my_id"
             >
             </post-object-component>
         </div>
 
         <v-divider></v-divider>
         <!-- 書き込み部分 -->
-        <create-component
-            @receiveInput="createPost"
-        ></create-component>
+        <create-component @receiveInput="createPost"></create-component>
     </div>
 </template>
 
 <script>
-// コンポーネントをインポート
 import ThreadObjectComponent from "../thread/ThreadObjectComponent.vue";
 import PostObjectComponent from "./PostObjectComponent.vue";
 import CreateComponent from "../common/CreateComponent.vue";
@@ -41,21 +36,21 @@ export default {
         },
         dest_d_post_id: {
             type: Number,
-            default: 1,
+            default: 1
         }
     },
     data() {
         return {
-            user_id: null,
+            my_id: 0,
             thread: {},
-            posts: {},
+            posts: {}
         };
     },
     methods: {
-        getUserId() {
-            console.log("this is getUserId");
-            axios.get("/api/users/id").then(res => {
-                this.user_id = res.data;
+        getMyId() {
+            console.log("this is getMyId");
+            axios.get("/api/users/me").then(res => {
+                this.my_id = res.data;
             });
         },
         getThread() {
@@ -66,49 +61,48 @@ export default {
         },
         getPosts() {
             console.log("this is getPosts");
-            axios.get("/api/posts/thread/" + this.thread_id).then(res => {
-                this.posts = res.data;
-            });
+            axios
+                .get("/api/posts/", {
+                    params: {
+                        where: "thread_id",
+                        value: this.thread_id
+                    }
+                })
+                .then(res => {
+                    this.posts = res.data;
+                });
         },
         createPost(emited_form_data) {
-            
             const form_data = emited_form_data;
             form_data.append("thread_id", this.thread_id);
-            console.log('this is post');
-            for (let value of form_data.entries()) { 
+            console.log("this is post");
+            for (let value of form_data.entries()) {
                 console.log(value);
             }
-            
+
             axios
-            .post("/api/posts", form_data, {
-                headers: { "content-type": "multipart/form-data" }
-            })
-            .then(response => {
-                console.log(response);
-                console.log('書き込み作成');
+                .post("/api/posts", form_data, {
+                    headers: { "content-type": "multipart/form-data" }
+                })
+                .then(response => {
+                    console.log(response);
+                    console.log("書き込み作成");
 
-                //書き込み再描画
-                this.getPosts();
-            })
-            .catch(error => {
-                console.log(error.response.data);
-            });
-        },
-        deletePost(emited_index) {
-            console.log('this is deletePost');
-            console.log(emited_index);
-            console.log(this.posts[emited_index]);
-            this.posts[emited_index].deleted_at = 'deleted';
-        },
-
+                    //書き込み再描画
+                    this.getPosts();
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                });
+        }
     },
     components: {
         ThreadObjectComponent,
         PostObjectComponent,
-        CreateComponent,
+        CreateComponent
     },
     mounted() {
-        this.getUserId();
+        this.getMyId();
         this.getThread();
         this.getPosts();
     }

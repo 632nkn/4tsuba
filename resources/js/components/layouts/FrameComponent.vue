@@ -144,7 +144,7 @@
 </template>
 
 <script>
-import ConfirmLoginComponent from "../user/ConfirmLoginComponent.vue";
+import ConfirmLoginComponent from "../auth/ConfirmLoginComponent.vue";
 export default {
     data() {
         return {
@@ -185,7 +185,7 @@ export default {
                 {
                     name: "スレッド作成",
                     icon: "mdi-plus-thick",
-                    link: "/create-thread"
+                    link: "/threads/create"
                 },
                 {
                     name: "通知",
@@ -200,15 +200,15 @@ export default {
                     lists: [
                         {
                             name: "ミュート設定",
-                            link: "/setting-mute"
+                            link: "/setting/mute"
                         },
                         {
                             name: "通知設定",
-                            link: "/setting-notification"
+                            link: "/setting/notification"
                         },
                         {
                             name: "アカウント設定",
-                            link: "/setting-account"
+                            link: "/setting/account/name"
                         }
                     ]
                 },

@@ -33,7 +33,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/test/{thread_id}', [PostController::class, 'returnPostCount']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -56,15 +55,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 //クエリパラメータはルーティングに書かずとも$requestで取得できる
 //例.  /threads?sort=2?desc=1  は $request->sort $request->desc
 
+//auth
+Route::get('/users/me', [AuthController::class, 'returnMyId']);
+Route::get('/users/me/info', [AuthController::class, 'returnMyInfo']);
+Route::post('/users/me/confirm', [AuthController::class, 'checkPassword']);
+Route::patch('users/', [AuthController::class, 'editPersonal']);
+
 //users
-Route::get('/users/id', [AuthController::class, 'returnUserId']);
+Route::get('/users/{user_id}', [UserController::class, 'returnUserInfo']);
+Route::patch('/users/{user_id}', [UserController::class, 'editName']);
 
 //threads
 Route::get('/threads', [ThreadController::class, 'index']);
 Route::get('/threads/{thread_id}', [ThreadController::class, 'show']);
 Route::post('/threads', [ThreadController::class, 'store']);
 //posts
-Route::get('/posts/thread/{thread_id}', [PostController::class, 'index']);
+Route::get('/posts/', [PostController::class, 'index']);
 Route::post('/posts', [PostController::class, 'store']);
 Route::delete('/posts', [PostController::class, 'destroy']);
 //images
