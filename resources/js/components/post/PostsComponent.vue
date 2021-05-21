@@ -1,9 +1,10 @@
 <template>
     <div>
-        <!-- スレッドオブジェクト-->
+        <div @click="getPosts" style="cursor: pointer;">
         <thread-object-component
             v-bind:thread="thread"
         ></thread-object-component>
+        </div>
 
         <!-- ポスト部分 -->
         <div v-for="(post, index) in posts" :key="post.id">
@@ -11,13 +12,15 @@
                 v-bind:post="post"
                 v-bind:index="index"
                 v-bind:my_id="my_id"
+                @receiveUpdate="updateEntry"
+                @receiveForResponses="getResponses"
             >
             </post-object-component>
         </div>
 
         <v-divider></v-divider>
         <!-- 書き込み部分 -->
-        <create-component @receiveInput="createPost"></create-component>
+        <create-component @receiveInput="storePost"></create-component>
     </div>
 </template>
 
@@ -72,14 +75,27 @@ export default {
                     this.posts = res.data;
                 });
         },
-        createPost(emited_form_data) {
-            const form_data = emited_form_data;
+        getResponses(emitted_displayed_post_id) {
+            console.log("this is getResponses");
+            axios
+                .get("/api/posts/", {
+                    params: {
+                        where: "responses",
+                        value: [this.thread_id, emitted_displayed_post_id],
+                    }
+                })
+                .then(res => {
+                    this.posts = res.data;
+                });
+            
+        },
+        storePost(emitted_form_data) {
+            const form_data = emitted_form_data;
             form_data.append("thread_id", this.thread_id);
             console.log("this is post");
             for (let value of form_data.entries()) {
                 console.log(value);
             }
-
             axios
                 .post("/api/posts", form_data, {
                     headers: { "content-type": "multipart/form-data" }
@@ -87,14 +103,17 @@ export default {
                 .then(response => {
                     console.log(response);
                     console.log("書き込み作成");
-
-                    //書き込み再描画
-                    this.getPosts();
+                    this.updateEntry();
                 })
                 .catch(error => {
                     console.log(error.response.data);
                 });
-        }
+        },
+        updateEntry() {
+            console.log('this is updateEntry');
+            this.getPosts();
+            this.getThread();
+        },
     },
     components: {
         ThreadObjectComponent,

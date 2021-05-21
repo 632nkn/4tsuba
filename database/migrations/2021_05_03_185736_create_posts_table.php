@@ -28,7 +28,7 @@ class CreatePostsTable extends Migration
             $table->unsignedBigInteger('displayed_post_id')->comment('スレッド内ポストID')->default(1);
             $table->string('body', 1000)->comment('本文')->default('本文なし');
             $table->boolean('has_image')->comment('画像があるか')->default(false);
-            $table->boolean('is_edited')->comment('編集済みか')->storedAs('case when created_at = updated_at then 0 else 1 end');
+            $table->boolean('is_edited')->comment('編集済みか')->default(0);
 
             //複合uniqueキー(ソフトデリートするが、「削除されました」状態でスレッド内IDを表示する。
             //そのため、スレッド内IDは重複してはいけないため、deleted_atを含まない)

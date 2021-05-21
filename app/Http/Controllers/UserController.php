@@ -18,8 +18,17 @@ class UserController extends Controller
             }, 'likes'])->get()[0];
     }
 
-    public function editName(Request $request)
+    public function editProfile(Request $request)
     {
-        User::find(Auth::id())->update(['name' => $request->name]);
+        User::find(Auth::id())->update(['name' => $request->name,]);
+
+        if ($request->file('icon')) {
+            $uploaded_icon = $request->file('icon');
+            $uploaded_icon->store('public/icons');
+            User::find(Auth::id())->update([
+                'icon_name' => $uploaded_icon->hashName(),
+                'icon_size' => $uploaded_icon->getSize(),
+            ]);
+        }
     }
 }

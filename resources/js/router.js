@@ -20,7 +20,7 @@ import RegisterComponent from "./components/auth/RegisterComponent";
 import LoginComponent from "./components/auth/LoginComponent";
 import LogoutComponent from "./components/auth/LogoutComponent";
 //setting
-import SettingNameComponent from "./components/setting/SettingNameComponent";
+import SettingProfileComponent from "./components/setting/SettingProfileComponent";
 import SettingConfirmComponent from "./components/setting/SettingConfirmComponent";
 import SettingPersonalComponent from "./components/setting/SettingPersonalComponent";
 
@@ -115,7 +115,7 @@ const router = new VueRouter({
          {
             path: '/setting/account/name',
             name: 'setting.name',
-            component: SettingNameComponent,
+            component: SettingProfileComponent,
          },
          {
             path: '/setting/account/confirm',

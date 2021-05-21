@@ -4,6 +4,12 @@
 
         <v-card flat class="ml-4">
             <v-toolbar color="green lighten-5" flat>
+                <v-list-item-avatar class="ml-n3 mr-3" size="50" tile>
+                    <img
+                        :src="'/storage/icons/' + user_info.icon_name"
+                        style="object-fit: cover;"
+                    />
+                </v-list-item-avatar>
                 <v-toolbar-title class="green--text">{{ user_info.name }}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn v-if="my_id == user_id"
@@ -12,7 +18,7 @@
                         depressed
                         to=/setting/account/name
                 >
-                        表示名を変更
+                        表示プロフィールを変更
                 </v-btn>
 
                 <template v-slot:extension>
@@ -161,16 +167,16 @@ export default {
                     this.user_like_posts = res.data;
                 });
         },
-        updatePosts(emited_post_id) {
+        updatePosts(emitted_post_id) {
           this.getUserLikePosts();
           this.getUserPosts();
         },
         //自分のプロフィールだった場合、「いいね」側でのハートマークの変更を「書込」側のハートマークへ反映
-        callUpdateTrueOrFalse(emited_post_id) {
+        callUpdateTrueOrFalse(emitted_post_id) {
             if(this.my_id == this.user_id) {
                 console.log('this is callUpdateTrueOrFalse');
                 for(let i=0; i<this.$refs.child.length; i++) {
-                    if(this.$refs.child[i].post.id == emited_post_id) {
+                    if(this.$refs.child[i].post.id == emitted_post_id) {
                         console.log('identified,' + this.$refs.child[i].post.id);
                         this.$refs.child[i].updateTrueOrFalse();
                     }

@@ -23,6 +23,24 @@ class ImageController extends Controller
         ]);
     }
 
+    public function edit(Request $request)
+    {
+        $uploaded_image = $request->file('image');
+        $uploaded_image->store('public/images');
+
+        Image::where('post_id', $request->id)
+            ->updateOrCreate(
+                [
+                    'post_id' => $request->id
+                ],
+                [
+                    'thread_id' => $request->thread_id,
+                    'image_name' => $uploaded_image->hashName(),
+                    'image_size' => $uploaded_image->getSize(),
+                ]
+            );
+    }
+
     public function destroy($post_id)
     {
         Image::where('post_id', $post_id)->delete();

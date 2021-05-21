@@ -84,5 +84,7 @@ class ThreadController extends Controller
 
         $post_controller = new PostController();
         $post_controller->store($request);
+
+        return $thread->id;
     }
 }

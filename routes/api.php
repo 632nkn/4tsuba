@@ -63,7 +63,7 @@ Route::patch('users/', [AuthController::class, 'editPersonal']);
 
 //users
 Route::get('/users/{user_id}', [UserController::class, 'returnUserInfo']);
-Route::patch('/users/{user_id}', [UserController::class, 'editName']);
+Route::post('/users/edit', [UserController::class, 'editProfile']);
 
 //threads
 Route::get('/threads', [ThreadController::class, 'index']);
@@ -72,10 +72,10 @@ Route::post('/threads', [ThreadController::class, 'store']);
 //posts
 Route::get('/posts/', [PostController::class, 'index']);
 Route::post('/posts', [PostController::class, 'store']);
+Route::post('/posts/edit', [PostController::class, 'edit']);
 Route::delete('/posts', [PostController::class, 'destroy']);
 //images
 Route::get('/images/threads', [ImageController::class, 'returnThreadImages']);
-
 
 //like
 Route::put('/like', [LikeController::class, 'store']);

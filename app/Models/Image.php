@@ -32,8 +32,8 @@ class Image extends Model
             'thread_id',
             'image_name',
             'image_size'
-        )->whereIn('id', function ($query) {
-            $query->select(DB::raw('min(id)'))->from('images')->groupBy('thread_id');
+        )->whereIn('post_id', function ($query) {
+            $query->select(DB::raw('min(post_id)'))->from('images')->groupBy('thread_id');
         })->orderBy('thread_id', 'asc');
     }
 }

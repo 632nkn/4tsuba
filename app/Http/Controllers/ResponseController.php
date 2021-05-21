@@ -24,4 +24,10 @@ class ResponseController extends Controller
             }
         }
     }
+
+    public function destroy(Request $request)
+    {
+        Response::where('thread_id', $request->thread_id)
+            ->where('origin_d_post_id', $request->displayed_post_id)->delete();
+    }
 }

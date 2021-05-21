@@ -3,6 +3,14 @@
         <headline-component v-bind:headline="headline"></headline-component>
 
         <v-form ref="form" v-model="valid">
+            <v-file-input
+                v-model="icon"
+                color="green lightten-2"
+                accept="image/png, image/gif, image/jpg, image/jpeg"
+                label="プロフィールアイコン"
+                chips
+                show-size
+            ></v-file-input>
             <v-text-field
                 label="表示名"
                 color="green lightten-3"
@@ -12,6 +20,7 @@
                 v-model="my_info.name"
                 :rules="[rules.required]"
             />
+
         </v-form>
         <div class="d-flex justify-end">
         <v-btn
@@ -19,7 +28,7 @@
             class="white--text"
             color="green lighten-2"
             depressed
-            @click="changeName"
+            @click="editProfile"
         >
              {{message}}
         </v-btn>
@@ -43,8 +52,9 @@ import HeadlineComponent from "../common/HeadlineComponent.vue";
 export default {
     data() {
         return {
-            headline: "表示名変更",
+            headline: "表示プロフィール変更",
             my_info: {},
+            icon: null,
             valid: null,
             rules: {
                 required: value => !!value || "必ず入力してください",
@@ -64,11 +74,17 @@ export default {
                 this.my_info = res.data;
             });
         },
-        changeName() {
-            console.log('this is changeName');
+        editProfile() {
+            console.log('this is editProfile');
+            const form_data = new FormData();
+            form_data.append("name", this.my_info.name);
+            if(this.icon !== null) {
+            form_data.append("icon", this.icon);
+            }
+            console.log(form_data);
             axios
-                .patch("/api/users/" + this.my_info.id, {
-                    name: this.my_info.name,
+                .post("/api/users/edit", form_data, {
+                    headers: { "content-type": "multipart/form-data" }
                 })
                 .then(response => {
                     console.log(response);

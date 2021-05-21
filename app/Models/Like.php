@@ -24,9 +24,9 @@ class Like extends Model
         return $this->belongsTo((Post::class));
     }
 
-    public function returnLoginUserLikeTable($thread_id)
+    public function returnLikedPostsTable($user_id)
     {
-        return $this->select('id as login_user_liked_post_id', DB::raw('1 as is_login_user_liked'))
-            ->where('user_id', Auth::id())->whereNotNull('user_id');
+        return $this->select('user_id as liking_user_id', 'post_id as liked_post_id', 'created_at as liked_at')
+            ->where('user_id', $user_id);
     }
 }

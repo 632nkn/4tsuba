@@ -26,7 +26,7 @@ class CreateImagesTable extends Migration
                 ->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->string('image_name', 100)->comment('画像名')->default('example.jqg');
             $table->unsignedInteger('image_size')->comment('画像サイズ')->default(0);
-            $table->boolean('is_edited')->comment('編集済みか')->storedAs('case when created_at = updated_at then 0 else 1 end');
+            $table->boolean('is_edited')->comment('編集済みか')->default(0);
         });
     }
 
