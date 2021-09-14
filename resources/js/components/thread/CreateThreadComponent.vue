@@ -1,7 +1,7 @@
 <template>
     <div>
         <headline-component v-bind:headline="headline"></headline-component>
-        <create-component v-bind:thread_or_post="thread_or_post" @receiveInput="create"></create-component>
+        <create-component v-bind:thread_or_post="'thread'" @receiveInput="create"></create-component>
     </div>
 </template>
 
@@ -14,7 +14,6 @@ export default {
     data: function() {
         return {
             headline: "スレッドを作成する",
-            thread_or_post: 'thread',
             thread_id: 0,
         };
     },

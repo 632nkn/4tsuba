@@ -11,7 +11,8 @@ use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LikeController;
-use App\Http\Controllers\ResponseController;
+use App\Http\Controllers\MuteWordController;
+use App\Http\Controllers\MuteUserController;
 
 
 use App\Http\Controllers\AuthController;
@@ -28,7 +29,7 @@ use App\Http\Controllers\AuthController;
 |
 */
 //検証
-Route::get('/user/check', [AuthController::class, 'checkLoginOrNot']);
+Route::get('/test', [MuteWordController::class, 'addHasMuteWordKeyToPosts']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -62,8 +63,18 @@ Route::post('/users/me/confirm', [AuthController::class, 'checkPassword']);
 Route::patch('users/', [AuthController::class, 'editPersonal']);
 
 //users
-Route::get('/users/{user_id}', [UserController::class, 'returnUserInfo']);
+Route::get('/users', [UserController::class, 'returnUserInfo']);
 Route::post('/users/edit', [UserController::class, 'editProfile']);
+//mute word
+Route::get('/mute_words', [MuteWordController::class, 'index']);
+Route::post('/mute_words', [MuteWordController::class, 'store']);
+Route::delete('/mute_words', [MuteWordController::class, 'destroy']);
+//mute user
+Route::get('/mute_users', [MuteUserController::class, 'index']);
+Route::put('/mute_users', [MuteUserController::class, 'store']);
+Route::delete('/mute_users', [MuteUserController::class, 'destroy']);
+
+
 
 //threads
 Route::get('/threads', [ThreadController::class, 'index']);

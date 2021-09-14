@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class Post extends Model
 {
@@ -15,14 +16,23 @@ class Post extends Model
 
     protected $fillable = [
         'user_id', 'thread_id', 'displayed_post_id',
-        'body', 'has_image'
+        'body', 'has_image', 'is_edited'
     ];
+
+
     //日付のキャスト
-    protected $casts = [
-        'created_at' => 'datetime:Y/n/j H:i',
-        'updated_at' => 'datetime:Y/n/j H:i',
-        'deleted_at' => 'datetime:Y/n/j H:i',
-    ];
+    public function getCreatedAtAttribute($value)
+    {
+        //Carbonはなぜかapp.phpのtimezoneを参照してくれずUTCを使う
+        $utc = Carbon::parse($value);
+        $tokyo = $utc->addHours(9);
+        $formatted_tokyo = $tokyo->format("Y/n/j H:i");
+        return $formatted_tokyo;
+    }
+    public function getUpdatedAtAttribute($value)
+    {
+        return  Carbon::parse($value)->addHours(9)->format("Y/n/j H:i");
+    }
 
 
     //リレーション定義

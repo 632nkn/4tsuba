@@ -12,6 +12,7 @@
                 </v-list-item-avatar>
                 <v-toolbar-title class="green--text">{{ user_info.name }}</v-toolbar-title>
                 <v-spacer></v-spacer>
+                <!-- 自分のプロフィールはプロフィール編集ボタン -->
                 <v-btn v-if="my_id == user_id"
                         class="white--text"
                         color="green lighten-2"
@@ -20,6 +21,36 @@
                 >
                         表示プロフィールを変更
                 </v-btn>
+                <!-- 他人のプロフィールはミュートボタン -->
+                <template v-else>
+                    <!-- ミュートしていない場合、ミュートボタン -->                    
+                    <v-tooltip v-if="!user_info.is_login_user_mute" bottom>
+                        <template v-slot:activator="{ on }">
+                            <span v-on="on"
+                                ><v-icon
+                                    class="ml-3 mt-n2"
+                                    @click="switchMute()"
+                                    >mdi-volume-high</v-icon
+                                ></span
+                            >
+                        </template>
+                        <span>ミュート</span>
+                    </v-tooltip>
+                    <!-- ミュートしている場合、ミュート解除ボタン -->                    
+                    <v-tooltip v-else bottom>
+                        <template v-slot:activator="{ on }">
+                            <span v-on="on"
+                                ><v-icon
+                                    class="ml-3 mt-n2"
+                                    @click="switchMute()"
+                                    >mdi-volume-off</v-icon
+                                ></span
+                            >
+                        </template>
+                        <span>ミュート解除</span>
+                    </v-tooltip>
+
+                </template>
 
                 <template v-slot:extension>
                     <!-- タブ -->
@@ -137,8 +168,13 @@ export default {
         },
         getUserInfo() {
             console.log("this is getUserInfo");
-            axios.get("/api/users/" + this.user_id).then(res => {
-                this.user_info = res.data;
+            console.log([this.user_id]);
+            axios.get("/api/users/", {
+                params: {
+                    user_id_list: [this.user_id]
+                }
+            }).then(res => {
+                this.user_info = res.data[0];
             });
         },
         getUserPosts() {
@@ -170,6 +206,51 @@ export default {
         updatePosts(emitted_post_id) {
           this.getUserLikePosts();
           this.getUserPosts();
+        },
+        switchMute() {
+            console.log('this is switchMute');
+
+            //ミュートする場合
+            if(!this.user_info.is_login_user_mute) {
+                if(confirm("このユーザーをミュートしますか？")) {
+                this.user_info.is_login_user_mute = 1;
+                axios
+                    .put("/api/mute_users", {
+                        user_id: this.user_id
+                    })
+                    .then(response => {
+                        console.log(response);
+                        console.log("ユーザーミュート登録完了");
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                    });
+
+                }
+            } 
+            //ミュート解除する場合
+            else {
+                if(confirm("ユーザーのミュートを解除しますか？")) {
+                this.user_info.is_login_user_mute = 0;
+                console.log(this.user_id);
+                axios
+                    .delete("/api/mute_users", {
+                        data: {
+                        user_id: this.user_id
+                        }
+
+                    })
+                    .then(response => {
+                        console.log(response);
+                        console.log("ユーザーミュート解除完了");
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                    });
+
+                }
+            }
+            
         },
         //自分のプロフィールだった場合、「いいね」側でのハートマークの変更を「書込」側のハートマークへ反映
         callUpdateTrueOrFalse(emitted_post_id) {

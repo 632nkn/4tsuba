@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 //Laravel Sanctum APIトークン？
 use Laravel\Sanctum\HasApiTokens;
+use Carbon\Carbon;
 
 
 class User extends Authenticatable
@@ -19,23 +20,30 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['name', 'icon_name', 'icon_size', 'email', 'password',];
+    protected $fillable = ['name', 'email', 'password', 'icon_name', 'icon_size',];
 
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token',];
+    protected $hidden = ['email', 'email_verified_at', 'password', 'remember_token',];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    //日付のキャスト Userモデルを使うとき、下記を整形する
+    public function getCreatedAtAttribute($value)
+    {
+        //Carbonはなぜかapp.phpのtimezoneを参照してくれずUTCを使う
+        return  Carbon::parse($value)->addHours(9)->format("Y/n/j H:i");
+    }
+    public function getUpdatedAtAttribute($value)
+    {
+        return  Carbon::parse($value)->addHours(9)->format("Y/n/j H:i");
+    }
 
     //リレーション定義
     public function threads()
@@ -50,5 +58,13 @@ class User extends Authenticatable
     public function likes()
     {
         return $this->hasMany(Like::class);
+    }
+    public function mute_words()
+    {
+        return $this->hasMany(MuteWord::class);
+    }
+    public function mute_users()
+    {
+        return $this->hasMany(MuteUser::class);
     }
 }

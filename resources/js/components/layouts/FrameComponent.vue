@@ -94,14 +94,29 @@
             <v-spacer></v-spacer>
             <v-text-field
                 class="mt-5"
-                append-outer-icon="mdi-magnify"
                 dense
                 color="green lighten-2"
                 label="書き込みに含まれる単語を検索"
                 placeholder="(渋谷 OR 代々木) ランチ"
-                hint="AND検索、OR検索に対応しています"
+                hint="複数単語はOR検索になります"
                 outlined
-            ></v-text-field>
+                v-model="search_string"
+            >
+            </v-text-field>
+            <router-link 
+                style="text-decoration: none;"
+                class="green--text text--lighten-1"
+                v-bind:to="{name: 'posts.search', params: {search_string: search_string}}"
+            >            
+                <v-btn
+                    icon
+                    class="white--text"
+                    color="green lighten-2"
+                    depressed
+                >
+                    <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+            </router-link>            
 
             <v-toolbar-items>
                 <v-btn text to="/register">ユーザー登録</v-btn>
@@ -148,6 +163,7 @@ import ConfirmLoginComponent from "../auth/ConfirmLoginComponent.vue";
 export default {
     data() {
         return {
+            search_string: null,
             mini: true,
             supports: [
                 {
@@ -188,26 +204,19 @@ export default {
                     link: "/threads/create"
                 },
                 {
-                    name: "通知",
-                    icon: "mdi-bell",
-                    link: "/notification",
-                    notification: 4
-                },
-
-                {
                     name: "設定",
                     icon: "mdi-cogs",
                     lists: [
                         {
-                            name: "ミュート設定",
-                            link: "/setting/mute"
+                            name: "ミュートワード",
+                            link: "/setting/mute_words"
                         },
                         {
-                            name: "通知設定",
-                            link: "/setting/notification"
+                            name: "ミュートユーザー",
+                            link: "/setting/mute_users"
                         },
                         {
-                            name: "アカウント設定",
+                            name: "マイプロフィール",
                             link: "/setting/account/name"
                         }
                     ]
@@ -227,7 +236,7 @@ export default {
             } else {
                 this.mini = false;
             }
-        }
+        },
     },
     created() {
         window.addEventListener("resize", this.handleResize);

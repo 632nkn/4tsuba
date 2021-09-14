@@ -1,6 +1,7 @@
 <template>
+    <!-- 【１】普通のポスト -->
     <v-card
-        v-if="post.deleted_at === null"
+        v-if="post.deleted_at === null && post.has_mute_words === false"
         color="light-green lighten-5"
         outlined
         class="my-3"
@@ -9,6 +10,8 @@
             <!-- 0行目 プロフィールページではスレッド情報を表示 -->
             <router-link 
                 style="text-decoration: none;"
+                onMouseOut="this.style.textDecoration='none';" 
+                onMouseOver="this.style.textDecoration='underline';"
                 class="green--text text--lighten-1"
                 v-bind:to="{name: 'thread.show', params: {thread_id: post.thread_id}}"
             >            
@@ -22,6 +25,8 @@
                 <span v-html="post.displayed_post_id"></span>
                 <router-link 
                     style="text-decoration: none;"
+                    onMouseOut="this.style.textDecoration='none';" 
+                    onMouseOver="this.style.textDecoration='underline';"                    
                     class="green--text text--lighten-1"
                     v-bind:to="{name: 'user.posts', params: {user_id: post.user_id}}"
                 >
@@ -45,6 +50,7 @@
                     <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                             <span v-on="on"
+                                  @click="emitForAnchor()"
                                 ><v-icon class="ml-3 mt-n2"
                                     >mdi-message-arrow-left-outline</v-icon
                                 ></span
@@ -91,7 +97,10 @@
                     </v-avatar>
                 </template>
                 <v-card-text>
-                    <div v-if="!is_editing">{{ post.body }}</div>
+                    <div v-if="!is_editing">
+                        <span v-if="!search"> {{post.body}}</span>
+                        <span v-else v-html="post.body_for_search"></span>
+                    </div>
                     <template v-else>
                         <v-form ref="form" v-model="valid" class="pa-4 ">
                             <v-textarea
@@ -158,6 +167,65 @@
             </div>
         </div>
     </v-card>
+    <!-- 【２】 ミュートワードを含むときのポスト -->
+    <v-card v-else-if="post.deleted_at === null && post.has_mute_words === true" color="blue-grey lighten-5" outlined class="my-3">
+        <!-- 1行目 -->
+        <v-card-text class="d-flex">
+            <span v-html="post.displayed_post_id"></span>
+            <span class="ml-3">
+                <router-link
+                    v-bind:to="{
+                        name: 'setting.mute_words',
+                    }"
+                >
+                    <span>ミュートワード</span>
+                </router-link>
+                <span>が含まれています。</span>
+            </span>
+            <v-btn
+                class="grey--text mt-n1"
+                color="blue-grey lighten-4"
+                depressed
+                small
+                @click="displayMutedPost"
+            >
+                書込を表示する
+            </v-btn>
+
+            <v-spacer></v-spacer>
+
+                <v-checkbox
+                    color="green lighten-2"
+                    on-icon="mdi-heart"
+                    off-icon="mdi-heart-outline"
+                    v-model="true_or_false"
+                    class="ml-4 mt-n2 d-inline"
+                    :label="String(post.likes_count)"
+                    @click="switchLike()"
+                ></v-checkbox>
+
+        </v-card-text>
+        <!-- 2行目 -->
+        <div class="d-flex mt-n8">
+            <v-card-text>
+                <template v-if="post.responded_count">
+                    <v-icon>mdi-message-arrow-left</v-icon>
+                    <router-link
+                        v-bind:to="{
+                            name: 'thread.responses',
+                            params: {
+                                thread_id: post.thread_id,
+                                displayed_post_id: post.displayed_post_id
+                            }
+                        }"
+                    >
+                        <span @click="emitForResponses">{{ post.responded_count }}件の返信</span>
+                    </router-link>
+                </template>
+            </v-card-text>
+        </div>
+    </v-card>
+    <!-- 【３】 コメントが削除されたときのポスト -->
     <v-card v-else color="blue-grey lighten-5" outlined class="my-3">
         <!-- 1行目 -->
         <v-card-text class="d-flex">
@@ -190,7 +258,7 @@
                             }
                         }"
                     >
-                        <span>{{ post.responded_count }}件の返信</span>
+                        <span @click="emitForResponses">{{ post.responded_count }}件の返信</span>
                     </router-link>
                 </template>
             </v-card-text>
@@ -217,6 +285,10 @@ export default {
             type: Boolean,
             default: false
         },
+        search: {
+            tyep:Boolean,
+            default: false
+        }
     },
     data() {
         return {
@@ -337,6 +409,10 @@ export default {
             this.post.image = this.before_edit.image;
             this.is_editing = false;
         },
+        displayMutedPost() {
+            console.log('this is displayMutedPost');
+            this.post.has_mute_words = false;
+        },
         deletePost() {
             console.log("this is deletePost");
 
@@ -363,6 +439,10 @@ export default {
         emitForResponses() {
             console.log("this is emitForResponses");
             this.$emit("receiveForResponses", this.post.displayed_post_id);
+        },
+        emitForAnchor() {
+            console.log('this is emitForAnchor★'+ this.post.displayed_post_id);
+            this.$emit("receiveForAnchor", this.post.displayed_post_id);
         }
     },
 };

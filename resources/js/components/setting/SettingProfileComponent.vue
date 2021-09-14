@@ -12,6 +12,7 @@
                 show-size
             ></v-file-input>
             <v-text-field
+                outlined
                 label="表示名"
                 color="green lightten-3"
                 name="name"

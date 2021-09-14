@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        //Carbonが使うタイムゾーンを設定
+        date_default_timezone_set('Asia/Tokyo');
     }
 }

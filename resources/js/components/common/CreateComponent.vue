@@ -29,6 +29,7 @@
                 :hint="'必須 & 最大' + limit.body + '文字'"
                 persistent-hint
                 :rules="[rules.required, rules.length_body]"
+                ref="focusBody"
             ></v-textarea>
 
             <!-- 画像 -->
@@ -77,6 +78,10 @@ export default {
             type: String,
             default: "post",
         },
+        anchor: {
+            type: String,
+            default: null
+        }
     },
     data: function() {
         return {
@@ -117,6 +122,8 @@ export default {
             this.$emit("receiveInput", form_data);
             this.input.body = null;
             this.input.image = null;
+            
+            
         },
         switchWords() {
             if(this.thread_or_post === 'thread') {
@@ -125,7 +132,15 @@ export default {
                 this.body_label = this.body_label.reverse();
             }
         },
-
+        writeAnchor() {
+            this.input.body = this.anchor;
+            this.$refs.focusBody.focus();
+        }
+    },
+    watch: {
+        anchor: function() {
+            this.writeAnchor();
+        }
     },
     mounted() {
         this.switchWords();

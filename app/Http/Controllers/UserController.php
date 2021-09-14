@@ -10,13 +10,23 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function returnUserInfo($user_id)
+    public function returnUserInfo(Request $request)
     {
-        return User::where('id', $user_id)
-            ->withCount(['posts' => function ($query) {
-                $query->withTrashed();
-            }, 'likes'])->get()[0];
+        $user_id_list = $request->user_id_list;
+        return User::whereIn('id', $user_id_list)
+            ->withCount([
+                'posts' => function ($query) {
+                    $query->withTrashed();
+                },
+                'likes',
+                'mute_users AS is_login_user_mute' => function ($query) use ($user_id_list) {
+                    $query->where('muting_user_id', Auth::id())->where('user_id', $user_id_list[0]);
+                },
+            ])->get();
     }
+
+
+
 
     public function editProfile(Request $request)
     {

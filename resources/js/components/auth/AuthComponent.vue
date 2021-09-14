@@ -9,6 +9,7 @@
                 <v-form ref="form" v-model="valid">
                     <v-text-field
                         v-if="register_or_login === 'register'"
+                        outlined
                         label="表示名"
                         placeholder="よつば"
                         color="green lightten-3"
@@ -19,6 +20,7 @@
                         :rules="[rules.required]"
                     />
                     <v-text-field
+                        outlined
                         label="メールアドレス"
                         placeholder="4tsuba@test.com"
                         color="green lightten-3"
@@ -30,6 +32,7 @@
                     />
 
                     <v-text-field
+                        outlined
                         id="password"
                         label="パスワード"
                         placeholder="p@ssw0rd"
@@ -42,6 +45,7 @@
                     />
 
                     <v-text-field
+                        outlined
                         v-if="register_or_login === 'register'"
                         label="パスワード(確認)"
                         placeholder="p@ssw0rd"

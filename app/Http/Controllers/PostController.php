@@ -7,7 +7,7 @@ use App\Models\Post;
 use App\Models\Thread;
 use App\Models\Response;
 use App\Models\Like;
-
+use App\Models\MuteWord;
 //authを使用する
 use Illuminate\Support\Facades\Auth;
 
@@ -76,8 +76,22 @@ class PostController extends Controller
                 $join->on('posts.id', '=', 'liked_posts_table.liked_post_id');
             })->whereNotNull('liked_posts_table.liked_post_id')->orderBy('liked_posts_table.liked_at', 'desc');
         }
+        //ワード検索
+        else if ($request->where == 'search') {
+            //$request->valueは検索単語の配列(vue側でsplit)
+            $search_word_list = $request->value;
+            $query->where(function ($query) use ($search_word_list) {
+                foreach ($search_word_list as $search_word) {
+                    $query->orWhere('posts.body', 'LIKE', "%" . $search_word . "%");
+                }
+            });
+            $query->orderBy('posts.created_at', 'desc');
+        }
 
         $posts = $query->get();
+        $mute_word = new MuteWord();
+        $posts = $mute_word->addHasMuteWordsKeyToPosts($posts);
+
         return $posts;
     }
 

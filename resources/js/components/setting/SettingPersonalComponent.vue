@@ -4,6 +4,7 @@
 
         <v-form ref="form" v-model="valid">
             <v-text-field
+                outlined
                 label="メールアドレス"
                 color="green lightten-3"
                 name="email"
@@ -14,6 +15,7 @@
             />
 
             <v-text-field
+                outlined
                 id="password"
                 label="パスワード"
                 color="green lightten-3"
@@ -25,6 +27,7 @@
             />
 
             <v-text-field
+                outlined
                 label="パスワード(確認)"
                 color="green lightten-3"
                 prepend-icon="lock"

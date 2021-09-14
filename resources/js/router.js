@@ -13,17 +13,21 @@ import CreateThreadComponent from "./components/thread/CreateThreadComponent";
 import ThreadsComponent from "./components/thread/ThreadsComponent";
 //posts
 import PostsComponent from "./components/post/PostsComponent";
+import SearchResultsComponent from "./components/post/SearchResultsComponent";
 //users
 import ProfileComponent from "./components/users/ProfileComponent.vue"
 //Auth
 import RegisterComponent from "./components/auth/RegisterComponent";
 import LoginComponent from "./components/auth/LoginComponent";
 import LogoutComponent from "./components/auth/LogoutComponent";
-//setting
+//setting account
 import SettingProfileComponent from "./components/setting/SettingProfileComponent";
 import SettingConfirmComponent from "./components/setting/SettingConfirmComponent";
 import SettingPersonalComponent from "./components/setting/SettingPersonalComponent";
-
+//setting mute_words
+import MuteWordsComponent from "./components/mute_word/MuteWordsComponent";
+//setting mute_users
+import MuteUsersComponent from "./components/mute_user/MuteUsersComponent";
 
 //URLと↑でimportしたコンポーネントをマッピングする（ルーティング設定
 const router = new VueRouter({
@@ -92,6 +96,14 @@ const router = new VueRouter({
             component: PostsComponent,
             props: true
          },
+         //posts
+         {
+            path: '/posts/:search_string',
+            name: 'posts.search',
+            component: SearchResultsComponent,
+            props: true
+         },
+
          //users
          {
             path: '/users/:user_id/posts',
@@ -127,9 +139,18 @@ const router = new VueRouter({
             name: 'setting.personal',
             component: SettingPersonalComponent,
          },
-
-
-
+         //ミュートワード
+         {
+            path: '/setting/mute_words',
+            name: 'setting.mute_words',
+            component: MuteWordsComponent,
+         },
+         //ミュートユーザー
+         {
+            path: '/setting/mute_users',
+            name: 'setting.mute_users',
+            component: MuteUsersComponent,
+         },
    ] 
    
 });

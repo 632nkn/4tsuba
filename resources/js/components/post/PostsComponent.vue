@@ -1,5 +1,6 @@
 <template>
     <div>
+        <!-- スレッドタイトル部分 -->
         <div @click="getPosts" style="cursor: pointer;">
         <thread-object-component
             v-bind:thread="thread"
@@ -14,13 +15,14 @@
                 v-bind:my_id="my_id"
                 @receiveUpdate="updateEntry"
                 @receiveForResponses="getResponses"
+                @receiveForAnchor="transferAnchor"
             >
             </post-object-component>
         </div>
 
         <v-divider></v-divider>
         <!-- 書き込み部分 -->
-        <create-component @receiveInput="storePost"></create-component>
+        <create-component @receiveInput="storePost" v-bind:anchor="anchor"></create-component>
     </div>
 </template>
 
@@ -46,7 +48,8 @@ export default {
         return {
             my_id: 0,
             thread: {},
-            posts: {}
+            posts: {},
+            anchor: null
         };
     },
     methods: {
@@ -89,6 +92,10 @@ export default {
                 });
             
         },
+        transferAnchor(emitted_displayed_post_id) {
+            console.log("this is transferAnchor");
+            this.anchor = '>>' + emitted_displayed_post_id + " ";
+        },
         storePost(emitted_form_data) {
             const form_data = emitted_form_data;
             form_data.append("thread_id", this.thread_id);
@@ -104,6 +111,7 @@ export default {
                     console.log(response);
                     console.log("書き込み作成");
                     this.updateEntry();
+
                 })
                 .catch(error => {
                     console.log(error.response.data);
