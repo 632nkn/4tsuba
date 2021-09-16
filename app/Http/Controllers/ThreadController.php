@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Thread;
 use App\Models\Image;
+use App\Models\Gatekeeper;
+
 //authを使用する
 use Illuminate\Support\Facades\Auth;
 
@@ -72,9 +74,13 @@ class ThreadController extends Controller
     //スレッド store
     public function store(Request $request)
     {
+        //NGワード置換
+        $gate_keeper = new GateKeeper();
+        $checked_title = $gate_keeper->convertNgWordsIfExist($request->title);
+
         $thread = Thread::create([
             'user_id' => Auth::id(),
-            'title' => $request->title,
+            'title' => $checked_title,
         ]);
 
         //リクエストにスレッドidを追加

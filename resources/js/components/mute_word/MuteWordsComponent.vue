@@ -1,6 +1,7 @@
 <template>
     <div color="red">
-        <headline-component :headline="headline"></headline-component>
+        <headline-component v-bind:headline="'ミュートワード設定：  設定中'+ mute_words.length + '件'">
+        </headline-component>
         <v-spacer />
         <v-row>
             <v-col cols="1"></v-col>
@@ -32,7 +33,6 @@ import MuteWordFormComponent from "./MuteWordFormComponent.vue";
 export default {
     data() {
         return {
-            headline: 'ミュートワード設定',
             my_id: 0,
             mute_words: {},
         }

@@ -8,6 +8,8 @@ use App\Models\Thread;
 use App\Models\Response;
 use App\Models\Like;
 use App\Models\MuteWord;
+use App\Models\MuteUser;
+use App\Models\Gatekeeper;
 //authを使用する
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +27,7 @@ class PostController extends Controller
 
         //select(*)ないと外部結合した列がでなくなるので注意
         $query = Post::query();
-        $query->select('*')->with(['thread', 'image', 'user',])->withTrashed()
+        $query->select('*')->with(['thread', 'image', 'user',])
             //  1がnullになるときがあるバグ
             // ->leftJoinSub($login_user_post_table, 'login_user_post_table', function ($join) {
             //     $join->on('posts.id', '=', 'login_user_post_table.login_user_posted_post_id');
@@ -43,7 +45,7 @@ class PostController extends Controller
             $response = new Response();
             $responded_count_table = $response->returnRespondedCountTable($request->value);
 
-            $query->leftJoinSub($responded_count_table, 'responded_count_table', function ($join) {
+            $query->withTrashed()->leftJoinSub($responded_count_table, 'responded_count_table', function ($join) {
                 $join->on('posts.displayed_post_id', '=', 'responded_count_table.dest_d_post_id');
             })->where('posts.thread_id', $request->value)->orderBy('posts.id');
         }
@@ -52,7 +54,7 @@ class PostController extends Controller
             $response = new Response();
             $responded_count_table = $response->returnRespondedCountTable($request->value);
 
-            $query->where('posts.thread_id', $request->value[0])
+            $query->withTrashed()->where('posts.thread_id', $request->value[0])
                 ->leftJoinSub($responded_count_table, 'responded_count_table', function ($join) {
                     $join->on('posts.displayed_post_id', '=', 'responded_count_table.dest_d_post_id');
                 })->where(function ($query) use ($request) {
@@ -72,7 +74,7 @@ class PostController extends Controller
             $like = new Like();
             $liked_posts_table = $like->returnLikedPostsTable($request->value);
 
-            $query->leftJoinSub($liked_posts_table, 'liked_posts_table', function ($join) {
+            $query->withTrashed()->leftJoinSub($liked_posts_table, 'liked_posts_table', function ($join) {
                 $join->on('posts.id', '=', 'liked_posts_table.liked_post_id');
             })->whereNotNull('liked_posts_table.liked_post_id')->orderBy('liked_posts_table.liked_at', 'desc');
         }
@@ -88,10 +90,33 @@ class PostController extends Controller
             $query->orderBy('posts.created_at', 'desc');
         }
 
+        //ポストの加工
         $posts = $query->get();
         $mute_word = new MuteWord();
         $posts = $mute_word->addHasMuteWordsKeyToPosts($posts);
+        $mute_user = new MuteUser();
+        $posts = $mute_user->addPostedByMuteUsersKeyToPosts($posts);
 
+        //これがなぜかできない
+        //$post = $post->only(['displayed_post_id', 'id']);
+        foreach ($posts as $post) {
+            if ($post['deleted_at'] != null) {
+                unset(
+                    $post['created_at'],
+                    $post['updated_at'],
+                    $post['user_id'],
+                    $post['body'],
+                    $post['has_image'],
+                    $post['is_edited'],
+                    $post['like_count'],
+                    $post['posted_by_mute_users'],
+                    $post['thread'],
+                    $post['image'],
+                    $post['user'],
+                    $post['has_mute_words']
+                );
+            }
+        }
         return $posts;
     }
 
@@ -104,12 +129,11 @@ class PostController extends Controller
             $request->body = 'コメントなし';
         }
 
-        //リクエストにスレッドidを追加
+        //リクエストにポストidを追加
         $temp_post = new Post();
         $request->merge([
             'displayed_post_id' => $temp_post->returnMaxDisplayedPostId($request->thread_id) + 1,
         ]);
-
 
         //返信関係登録
         if (strpos($request->body, '>>') !== false) {
@@ -117,11 +141,15 @@ class PostController extends Controller
             $response_controller->store($request);
         }
 
+        //NGワード置換
+        $gate_keeper = new GateKeeper();
+        $checked_body = $gate_keeper->convertNgWordsIfExist($request->body);
+
         $post = Post::create([
             'user_id' => Auth::id(),
             'thread_id' => $request->thread_id,
             'displayed_post_id' => $request->displayed_post_id,
-            'body' => $request->body,
+            'body' => $checked_body,
             'has_image' => $request->hasFile('image'),
         ]);
 
@@ -143,9 +171,13 @@ class PostController extends Controller
     //ポスト更新
     public function edit(Request $request)
     {
+        //NGワード置換
+        $gate_keeper = new GateKeeper();
+        $checked_body = $gate_keeper->convertNgWordsIfExist($request->body);
+
         Post::where('id', $request->id)->where('user_id', Auth::id())
             ->update([
-                'body' => $request->body,
+                'body' => $checked_body,
                 'has_image' => $request->hasFile('image'),
                 'is_edited' => 1,
             ]);
@@ -157,6 +189,7 @@ class PostController extends Controller
         if (strpos($request->body, '>>') !== false) {
             $response_controller->store($request);
         }
+
 
         //画像があれば
         if ($request->hasFile('image')) {

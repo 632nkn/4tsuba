@@ -1,6 +1,6 @@
 <template>
     <div>
-        <headline-component v-bind:headline="headline"></headline-component>
+        <headline-component v-bind:headline="'メールアドレス/パスワード 変更'"></headline-component>
 
         <v-form ref="form" v-model="valid">
             <v-text-field
@@ -36,7 +36,7 @@
             />
         </v-form>
         <div class="d-flex justify-end">
-        <v-btn
+        <v-btn v-if="my_info.role !== 'guest'"
             :disabled="!valid"
             class="white--text"
             color="green lighten-2"
@@ -45,6 +45,13 @@
         >
              {{message}}
         </v-btn>
+        <v-card v-else
+        color="grey lighten-2"
+        outlined
+        class="my-3 d-flex"
+        > <span class="grey--text">{{message_for_guest}}</span>
+        </v-card>
+
         </div>
         <div class="mt-8 grey--text text--darken-1 d-flex justify-end">
             <v-icon class="mb-1" color="green lighten-3"
@@ -63,7 +70,6 @@ import HeadlineComponent from "../common/HeadlineComponent.vue";
 export default {
     data() {
         return {
-            headline: "メールアドレス/パスワード 変更",
             my_info: {},
             password: null,
             valid: null,
@@ -89,8 +95,9 @@ export default {
                 }
             },
             notice: '表示プロフィールの変更はこちら',
-            link: '/setting/account/name',
+            link: '/setting/account/profile',
             message: 'メールアドレス/パスワードを変更する',
+            message_for_guest: 'ゲストユーザーは変更できません',
         };
     },
     components: {
@@ -112,8 +119,13 @@ export default {
                 })
                 .then(response => {
                     console.log(response);
-                    alert('メールアドレス/パスワード を変更しました。')
-                    this.$router.push("/users/" + this.my_info.id + "/posts");
+                    console.log(response.data);
+                    if(response.data != 'guest') {
+                        alert('メールアドレス/パスワード を変更しました。');
+                    }else {
+                        alert('ゲストユーザーはメールアドレス/パスワードを変更できません。');
+                    }
+                    //this.$router.push("/users/" + this.my_info.id + "/posts");
 
                 })
         }

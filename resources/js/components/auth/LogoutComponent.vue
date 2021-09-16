@@ -2,6 +2,15 @@
     <div class="p-5">
         <h1>Laravel Airlock</h1>
         <button class="btn btn-danger mb-3" @click="logout">ログアウト</button>
+                <v-btn
+                    class="white--text"
+                    color="green lighten-2"
+                    depressed
+                    @click="logout"
+                >
+                    はい
+                </v-btn>
+
     </div>
 </template>
 

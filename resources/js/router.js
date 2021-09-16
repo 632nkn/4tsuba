@@ -22,7 +22,6 @@ import LoginComponent from "./components/auth/LoginComponent";
 import LogoutComponent from "./components/auth/LogoutComponent";
 //setting account
 import SettingProfileComponent from "./components/setting/SettingProfileComponent";
-import SettingConfirmComponent from "./components/setting/SettingConfirmComponent";
 import SettingPersonalComponent from "./components/setting/SettingPersonalComponent";
 //setting mute_words
 import MuteWordsComponent from "./components/mute_word/MuteWordsComponent";
@@ -125,14 +124,9 @@ const router = new VueRouter({
          },
          //setting
          {
-            path: '/setting/account/name',
-            name: 'setting.name',
+            path: '/setting/account/profile',
+            name: 'setting.profile',
             component: SettingProfileComponent,
-         },
-         {
-            path: '/setting/account/confirm',
-            name: 'setting.confirm',
-            component: SettingConfirmComponent,
          },
          {
             path: '/setting/account/personal',

@@ -16,6 +16,7 @@ use App\Http\Controllers\MuteUserController;
 
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GuestAuthController;
 
 
 /*
@@ -30,14 +31,19 @@ use App\Http\Controllers\AuthController;
 */
 //検証
 Route::get('/test', [MuteWordController::class, 'addHasMuteWordKeyToPosts']);
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
+//ゲストユーザーログイン用
+Route::get('/login/guest/{user_id}', [GuestAuthController::class, 'guestLogin']);
+
+//検証用 ConfirmLoginComponent
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+Route::get('/check', [AuthController::class, 'checkLoginOrNot']);
 
 
 //タスク
@@ -61,10 +67,13 @@ Route::get('/users/me', [AuthController::class, 'returnMyId']);
 Route::get('/users/me/info', [AuthController::class, 'returnMyInfo']);
 Route::post('/users/me/confirm', [AuthController::class, 'checkPassword']);
 Route::patch('users/', [AuthController::class, 'editPersonal']);
+Route::post('/users/me/profile', [UserController::class, 'editProfile']);
+//ゲスト用初期化
+Route::get('/users/me/profile', [UserController::class, 'resetGuestProfile']);
 
 //users
 Route::get('/users', [UserController::class, 'returnUserInfo']);
-Route::post('/users/edit', [UserController::class, 'editProfile']);
+
 //mute word
 Route::get('/mute_words', [MuteWordController::class, 'index']);
 Route::post('/mute_words', [MuteWordController::class, 'store']);

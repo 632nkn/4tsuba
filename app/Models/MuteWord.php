@@ -40,7 +40,9 @@ class MuteWord extends Model
                 $post['has_mute_words'] = $tf;
             }
         } else {
-            $post['has_mute_words'] = false;
+            foreach ($posts as $post) {
+                $post['has_mute_words'] = false;
+            }
         }
         return $posts;
     }

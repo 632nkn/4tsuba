@@ -57,7 +57,7 @@ export default {
                 },
             },
             notice: '表示プロフィールの変更はこちら',
-            link: '/setting/account/name',
+            link: '/setting/account/profile',
             message: 'パスワードを送信する',
         };
     },

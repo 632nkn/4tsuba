@@ -24,7 +24,7 @@
         <v-btn
             icon
             class="white--text"
-            color="green lighten-2"
+            color="red lighten-2"
             depressed
             @click="destroyMuteUser"
         >

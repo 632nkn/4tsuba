@@ -23,7 +23,11 @@ class AuthController extends Controller
 
     public function returnMyInfo()
     {
-        return User::find(Auth::id());
+        if (Auth::id()) {
+            return User::find(Auth::id())->makeVisible(['email']);
+        } else {
+            return null;
+        }
     }
 
     public function checkPassword(Request $request)
@@ -34,15 +38,24 @@ class AuthController extends Controller
 
     public function editPersonal(Request $request)
     {
-        $request->validate([
-            'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required', 'between:8,20'],
-        ]);
+        $user = User::find(Auth::id())->first();
 
-        User::find(Auth::id())->update([
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
+        if ($user->role !== 'guest') {
+
+            $request->validate([
+                'email' => ['required', 'email', 'unique:users'],
+                'password' => ['required', 'between:8,20'],
+            ]);
+
+            $user->update([
+                'email' => $request->email,
+                'password' => bcrypt($request->password)
+            ]);
+        }
+        //ゲストユーザーは変更禁止
+        else {
+            return 'guest';
+        }
     }
 
     public function login(Request $request)

@@ -24,7 +24,7 @@ export default {
         },
         checkLoginOrNot() {
             axios
-            .get("/api/user/check")
+            .get("/api/check")
             .then(function(response){
                 this.is_login = response.data;
             })

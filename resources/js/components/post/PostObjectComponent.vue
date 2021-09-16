@@ -1,7 +1,7 @@
 <template>
     <!-- 【１】普通のポスト -->
     <v-card
-        v-if="post.deleted_at === null && post.has_mute_words === false"
+        v-if="post.deleted_at === null && post.has_mute_words === false && post.posted_by_mute_users === false"
         color="light-green lighten-5"
         outlined
         class="my-3"
@@ -191,19 +191,6 @@
             >
                 書込を表示する
             </v-btn>
-
-            <v-spacer></v-spacer>
-
-                <v-checkbox
-                    color="green lighten-2"
-                    on-icon="mdi-heart"
-                    off-icon="mdi-heart-outline"
-                    v-model="true_or_false"
-                    class="ml-4 mt-n2 d-inline"
-                    :label="String(post.likes_count)"
-                    @click="switchLike()"
-                ></v-checkbox>
-
         </v-card-text>
         <!-- 2行目 -->
         <div class="d-flex mt-n8">
@@ -225,14 +212,61 @@
             </v-card-text>
         </div>
     </v-card>
-    <!-- 【３】 コメントが削除されたときのポスト -->
+    <!-- 【3】 ミュートユーザーによるポスト -->
+    <v-card v-else-if="post.deleted_at === null && post.posted_by_mute_users === true" color="blue-grey lighten-5" outlined class="my-3">
+        <!-- 1行目 -->
+        <v-card-text class="d-flex">
+            <span v-html="post.displayed_post_id"></span>
+            <span class="ml-3">
+                <router-link
+                    v-bind:to="{
+                        name: 'setting.mute_users',
+                    }"
+                >
+                    <span>ミュートユーザー</span>
+                </router-link>
+                <span>による書き込みです。</span>
+            </span>
+            <v-btn
+                class="grey--text mt-n1"
+                color="blue-grey lighten-4"
+                depressed
+                small
+                @click="displayMutedPost"
+            >
+                書込を表示する
+            </v-btn>
+        </v-card-text>
+        <!-- 2行目 -->
+        <div class="d-flex mt-n8">
+            <v-card-text>
+                <template v-if="post.responded_count">
+                    <v-icon>mdi-message-arrow-left</v-icon>
+                    <router-link
+                        v-bind:to="{
+                            name: 'thread.responses',
+                            params: {
+                                thread_id: post.thread_id,
+                                displayed_post_id: post.displayed_post_id
+                            }
+                        }"
+                    >
+                        <span @click="emitForResponses">{{ post.responded_count }}件の返信</span>
+                    </router-link>
+                </template>
+            </v-card-text>
+        </div>
+    </v-card>
+    <!-- 【4】 コメントが削除されたときのポスト -->
     <v-card v-else color="blue-grey lighten-5" outlined class="my-3">
         <!-- 1行目 -->
         <v-card-text class="d-flex">
             <span v-html="post.displayed_post_id"></span>
             <span class="ml-3">書込者が削除しました。</span>
-            <v-spacer></v-spacer>
-
+            <!-- 削除済みコメントにはいいねボタンを表示しない。 
+            ただし、いいねした後削除したときのみいいねボタンを表示する(はずせるようにするため)。 -->
+            <template v-if="post.login_user_liked">
+                <v-spacer></v-spacer>
                 <v-checkbox
                     color="green lighten-2"
                     on-icon="mdi-heart"
@@ -242,7 +276,7 @@
                     :label="String(post.likes_count)"
                     @click="switchLike()"
                 ></v-checkbox>
-
+            </template>
         </v-card-text>
         <!-- 2行目 -->
         <div class="d-flex mt-n8">
@@ -411,7 +445,14 @@ export default {
         },
         displayMutedPost() {
             console.log('this is displayMutedPost');
-            this.post.has_mute_words = false;
+            if(this.post.has_mute_words === true) {
+                this.post.has_mute_words = false;
+            }
+            if(this.post.posted_by_mute_users === true) {
+                this.post.posted_by_mute_users = false;
+            }
+
+
         },
         deletePost() {
             console.log("this is deletePost");

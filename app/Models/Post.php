@@ -33,6 +33,13 @@ class Post extends Model
     {
         return  Carbon::parse($value)->addHours(9)->format("Y/n/j H:i");
     }
+    public function getDeletedAtAttribute($value)
+    {
+        //if条件つけないと全てに+9時間ついて、deleted_atがnullではなくなってしまう
+        if ($value != null) {
+            return  Carbon::parse($value)->addHours(9)->format("Y/n/j H:i");
+        }
+    }
 
 
     //リレーション定義

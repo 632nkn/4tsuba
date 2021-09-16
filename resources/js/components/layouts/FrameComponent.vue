@@ -11,22 +11,24 @@
         >
             <v-container>
                 <!-- アバター部分 -->
-                <v-list-item color="green lighten-2" to="/John">
-                    <v-list-item-avatar tile>
-                        <v-img
-                            src="https://cdn.vuetifyjs.com/images/john.png"
-                        ></v-img>
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                        <v-list-item-title class="title">
-                            John Leider
-                        </v-list-item-title>
-                        <v-list-item-subtitle 
-                            >john@vuetifyjs.com</v-list-item-subtitle
-                        >
-                    </v-list-item-content>
-                </v-list-item>
-
+                <template v-if="my_info">
+                    <v-list-item color="green lighten-2" :to="'/users/' + my_info['id'] + '/posts'">
+                            <v-list-item-avatar size="50" tile>
+                                <img
+                                    :src="'/storage/icons/' + my_info.icon_name"
+                                    style="object-fit: cover;"
+                                />
+                            </v-list-item-avatar>
+                            <v-list-item-content>
+                                <v-list-item-title class="green-text">
+                                    {{ my_info.name}}
+                                </v-list-item-title>
+                                <v-list-item-subtitle>
+                                    {{my_info.email}}
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                    </v-list-item>
+                </template>
                 <v-divider></v-divider>
 
                 <!-- リスト部分 -->
@@ -119,7 +121,7 @@
             </router-link>            
 
             <v-toolbar-items>
-                <v-btn text to="/register">ユーザー登録</v-btn>
+                <v-btn text to="/login">ログイン</v-btn>
                 <v-menu offset-y>
                     <template v-slot:activator="{ on }">
                         <v-btn v-on="on" text
@@ -127,7 +129,6 @@
                         >
                     </template>
                     <v-list>
-                        <v-subheader>Get help</v-subheader>
                         <v-list-item
                             v-for="support in supports"
                             :key="support.name"
@@ -163,6 +164,7 @@ import ConfirmLoginComponent from "../auth/ConfirmLoginComponent.vue";
 export default {
     data() {
         return {
+            my_info: null,
             search_string: null,
             mini: true,
             supports: [
@@ -172,25 +174,15 @@ export default {
                     link: "/explanation"
                 },
                 {
-                    name: "アナリティクス",
-                    icon: "mdi-discord",
-                    link: "/analytics"
-                },
-                {
-                    name: "バグ報告",
-                    icon: "mdi-bug",
-                    link: "/report-a-bug"
+                    name: "ユーザー登録",
+                    icon: "mdiaccount-plus",
+                    link: "/register"
                 },
                 {
                     name: "作者Github",
                     icon: "mdi-github-face",
                     link: "/guthub-issue-board"
                 },
-                {
-                    name: "Stack overview",
-                    icon: "mdi-stack-overflow",
-                    link: "/stack-overview"
-                }
             ],
             nav_lists: [
                 {
@@ -217,7 +209,7 @@ export default {
                         },
                         {
                             name: "マイプロフィール",
-                            link: "/setting/account/name"
+                            link: "/setting/account/profile"
                         }
                     ]
                 },
@@ -230,6 +222,12 @@ export default {
         };
     },
     methods: {
+        getMyInfo() {
+            console.log("this is getMyInfo");
+            axios.get("/api/users/me/info").then(res => {
+                this.my_info = res.data;
+            });
+        },
         handleResize: function() {
             if (window.innerWidth <= 960) {
                 this.mini = true;
@@ -244,6 +242,9 @@ export default {
     },
     destroyed() {
         window.removeEventListener("resize", this.handleResize);
+    },
+    mounted() {
+        this.getMyInfo();
     },
     components: {
         ConfirmLoginComponent,

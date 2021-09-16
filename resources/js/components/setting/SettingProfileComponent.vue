@@ -30,10 +30,19 @@
             color="green lighten-2"
             depressed
             @click="editProfile"
-        >
-             {{message}}
+        >変更する
         </v-btn>
         </div>
+        <div v-if="my_info.role === 'guest'" class="d-flex justify-end">
+        <v-btn
+            class="white--text mt-3"
+            color="green lighten-2"
+            depressed
+            @click="resetProfile"
+        >デフォルト表示に戻す<br>(ゲストユーザー専用)
+        </v-btn>
+        </div>
+
         <div class="mt-8 grey--text text--darken-1 d-flex justify-end">
             <v-icon class="mb-1" color="green lighten-3"
                 >mdi-information-outline</v-icon
@@ -61,8 +70,7 @@ export default {
                 required: value => !!value || "必ず入力してください",
             },
             notice: 'メールアドレス / パスワード の変更はこちら',
-            link: '/setting/account/confirm',
-            message: '変更する'
+            link: '/setting/account/personal',
         };
     },
     components: {
@@ -84,7 +92,7 @@ export default {
             }
             console.log(form_data);
             axios
-                .post("/api/users/edit", form_data, {
+                .post("/api/users/me/profile", form_data, {
                     headers: { "content-type": "multipart/form-data" }
                 })
                 .then(response => {
@@ -92,6 +100,14 @@ export default {
                     this.$router.push("/users/" + this.my_info.id + "/posts");
                 })
 
+        },
+        resetProfile() {
+            console.log('this is resetProfile');
+            axios.get("/api/users/me/profile")
+            .then(response => {
+                    console.log(response);
+                    this.$router.push("/users/" + this.my_info.id + "/posts");
+            })
         }
     },
     mounted() {

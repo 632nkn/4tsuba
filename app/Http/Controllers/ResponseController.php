@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\CheckBody;
+use App\Models\Gatekeeper;
 use App\Models\Response;
 
 
@@ -11,8 +11,8 @@ class ResponseController extends Controller
 {
     public function store(Request $request)
     {
-        $check_body = new CheckBody();
-        $dest_displayed_post_id_list = $check_body->returnDestinationDisplayedPostIdList($request->body);
+        $gate_keeper = new Gatekeeper();
+        $dest_displayed_post_id_list = $gate_keeper->returnDestinationDisplayedPostIdList($request->body);
 
         if ($dest_displayed_post_id_list) {
             for ($i = 0; $i < count($dest_displayed_post_id_list); $i++) {

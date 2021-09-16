@@ -17,7 +17,7 @@
                         class="white--text"
                         color="green lighten-2"
                         depressed
-                        to=/setting/account/name
+                        to=/setting/account/profile
                 >
                         表示プロフィールを変更
                 </v-btn>
@@ -29,6 +29,7 @@
                             <span v-on="on"
                                 ><v-icon
                                     class="ml-3 mt-n2"
+                                    color="green lighten-2"
                                     @click="switchMute()"
                                     >mdi-volume-high</v-icon
                                 ></span
@@ -42,6 +43,7 @@
                             <span v-on="on"
                                 ><v-icon
                                     class="ml-3 mt-n2"
+                                    color="red lighten-2"
                                     @click="switchMute()"
                                     >mdi-volume-off</v-icon
                                 ></span
@@ -221,6 +223,7 @@ export default {
                     .then(response => {
                         console.log(response);
                         console.log("ユーザーミュート登録完了");
+                        this.getUserPosts();
                     })
                     .catch(error => {
                         console.log(error.response.data);
@@ -243,6 +246,7 @@ export default {
                     .then(response => {
                         console.log(response);
                         console.log("ユーザーミュート解除完了");
+                        this.getUserPosts();
                     })
                     .catch(error => {
                         console.log(error.response.data);
