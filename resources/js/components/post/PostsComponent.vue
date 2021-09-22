@@ -9,7 +9,7 @@
         </div>
         <v-btn @click="showImages"></v-btn>
         <!-- Light Box -->
-        <light-box
+        <light-box v-if="media.length > 0"
             ref="lightbox"
             :media="media"
             :show-light-box="false"

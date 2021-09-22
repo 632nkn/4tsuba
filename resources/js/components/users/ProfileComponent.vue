@@ -75,13 +75,13 @@
                 </template>
             </v-toolbar>
             <!-- Light Box -->
-            <light-box
+            <light-box v-if="posted_media.length > 0"
                 ref="lightbox_for_post"
                 :media="posted_media"
                 :show-light-box="false"
                 :show-caption="true"
             ></light-box>
-            <light-box
+            <light-box v-if="liked_media.length > 0"
                 ref="lightbox_for_like"
                 :media="liked_media"
                 :show-light-box="false"
@@ -229,6 +229,8 @@ export default {
         updatePosts(emitted_post_id) {
           this.getUserLikePosts();
           this.getUserPosts();
+          this.getPostedImagesForLightBox();
+          this.getLikedImagesForLightBox();
         },
         switchMute() {
             console.log('this is switchMute');
@@ -287,6 +289,7 @@ export default {
                         this.$refs.child[i].updateTrueOrFalse();
                     }
                 }
+                this.updatePosts();
             }
         },
         getPostedImagesForLightBox() {

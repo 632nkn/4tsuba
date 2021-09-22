@@ -48,46 +48,33 @@ class ImageController extends Controller
         Image::where('post_id', $post_id)->delete();
     }
 
+    //以下LightBoxのAPI
     public function returnImagesForTheThread($thread_id)
     {
-        $images = DB::table('images')->leftJoin('posts', 'images.post_id', '=', 'posts.id')
-            ->leftJoin('users', 'posts.user_id', '=', 'users.id')->select(
-                'posts.displayed_post_id',
-                'images.post_id',
-                DB::raw('CONCAT("/storage/images/", images.image_name) as thumb'),
-                DB::raw('CONCAT("/storage/images/", images.image_name) as src'),
-                DB::raw('CONCAT("【レス番:", posts.displayed_post_id, "】【ユーザー:", users.name, "】「", posts.body, "」") as caption'),
-            )->where('images.thread_id', $thread_id)->orderBy('posts.displayed_post_id')->get();
-        return $images;
+        $image = new Image();
+        return $image->returnImagesForTheThread($thread_id);
     }
-
     public function returnImagesTheUserPosted($user_id)
     {
-        $images = DB::table('images')->leftJoin('posts', 'images.post_id', '=', 'posts.id')
-            ->leftJoin('threads', 'images.thread_id', '=', 'threads.id')
-            ->select(
-                'posts.displayed_post_id',
-                'images.post_id',
-                DB::raw('CONCAT("/storage/images/", images.image_name) as thumb'),
-                DB::raw('CONCAT("/storage/images/", images.image_name) as src'),
-                DB::raw('CONCAT("【スレッド:", threads.title, "】【レス番:", posts.displayed_post_id, "】「", posts.body, "」") as caption'),
-            )->where('posts.user_id', $user_id)->orderBy('posts.id', 'desc')->get();
-        return $images;
+        if (true) {
+            $image = new Image();
+            return $image->returnImagesTheUserPosted($user_id);
+        }
     }
     public function returnImagesTheUserLiked($user_id)
     {
+        if (true) {
+            $image = new Image();
+            return $image->returnImagesTheUserLiked($user_id);
+        }
+    }
+    public function returnImagesForTheSearch(Request $request)
+    {
+        $search_word_list = $request->unique_word_list;
 
-        $images = DB::table('images')->leftJoin('posts', 'images.post_id', '=', 'posts.id')
-            ->leftJoin('threads', 'images.thread_id', '=', 'threads.id')
-            ->select(
-                'posts.displayed_post_id',
-                'images.post_id',
-                DB::raw('CONCAT("/storage/images/", images.image_name) as thumb'),
-                DB::raw('CONCAT("/storage/images/", images.image_name) as src'),
-                DB::raw('CONCAT("【スレッド:", threads.title, "】【レス番:", posts.displayed_post_id, "】「", posts.body, "」") as caption'),
-            )->whereIn('images.post_id', function ($query) use ($user_id) {
-                $query->select('post_id')->from('likes')->where('likes.user_id', $user_id);
-            })->orderBy('posts.id', 'desc')->get();
-        return $images;
+        if (true) {
+            $image = new Image();
+            return $image->returnImagesForTheSearch($search_word_list);
+        }
     }
 }
