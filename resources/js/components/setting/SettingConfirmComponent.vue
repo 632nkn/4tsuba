@@ -75,7 +75,7 @@ export default {
                     console.log(response);
                     this.is_verified = Boolean(response.data);
                     if(this.is_verified) {
-                    this.$router.push("/setting/account/personal");
+                    this.$router.push("/setting/account/account");
                     }
                     else {
                         alert('パスワードが違います。');

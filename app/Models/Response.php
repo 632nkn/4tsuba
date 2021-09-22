@@ -11,7 +11,7 @@ class Response extends Model
     use HasFactory;
 
     protected $fillable = ['thread_id', 'origin_d_post_id', 'dest_d_post_id'];
-
+    protected $hidden = ['created_at', 'updated_at'];
     //リレーション定義
     public function thread()
     {

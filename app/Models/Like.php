@@ -13,6 +13,7 @@ class Like extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'post_id'];
+    protected $hidden = ['created_at', 'updated_at'];
 
     //リレーション定義
     public function user()

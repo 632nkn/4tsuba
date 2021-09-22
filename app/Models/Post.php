@@ -16,8 +16,10 @@ class Post extends Model
 
     protected $fillable = [
         'user_id', 'thread_id', 'displayed_post_id',
-        'body', 'has_image', 'is_edited'
+        'body', 'is_edited'
     ];
+
+    protected $hidden = ['updated_at'];
 
 
     //日付のキャスト

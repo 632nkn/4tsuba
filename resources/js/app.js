@@ -8,7 +8,7 @@ require('./bootstrap');
 
 import router from './router';
 import vuetify from './vuetify';
-import vuelidate from './vuelidate';
+import vueLazyLoad from './vueLazyLoad';
 
 
 import './../sass/app.scss'
@@ -50,5 +50,5 @@ const app = new Vue({
     el: '#app',
     router,
     vuetify,
-    vuelidate,
+    vueLazyLoad,
 });

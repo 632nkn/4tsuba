@@ -69,8 +69,8 @@ export default {
             rules: {
                 required: value => !!value || "必ず入力してください",
             },
-            notice: 'メールアドレス / パスワード の変更はこちら',
-            link: '/setting/account/personal',
+            notice: 'メールアドレス・パスワードの変更 はこちら',
+            link: '/setting/account/account',
         };
     },
     components: {
@@ -98,6 +98,7 @@ export default {
                 .then(response => {
                     console.log(response);
                     this.$router.push("/users/" + this.my_info.id + "/posts");
+                    this.$router.go({path: "/users/" + this.my_info.id + "/posts", force: true});
                 })
 
         },
@@ -107,6 +108,7 @@ export default {
             .then(response => {
                     console.log(response);
                     this.$router.push("/users/" + this.my_info.id + "/posts");
+                    this.$router.go({path: "/users/" + this.my_info.id + "/posts", force: true});
             })
         }
     },

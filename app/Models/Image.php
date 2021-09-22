@@ -12,6 +12,7 @@ class Image extends Model
 {
     use HasFactory;
     protected $fillable = ['thread_id', 'post_id', 'image_name', 'image_size'];
+    protected $hidden = ['created_at', 'updated_at', 'image_size'];
 
     //リレーション定義
     public function thread()

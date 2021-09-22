@@ -135,10 +135,11 @@ export default {
                             console.log(response);
                             localStorage.setItem("auth", "ture");
                             this.$router.push("/threads");
+                            this.$router.go({ path: "/threads", force: true });
                         })
                         .catch(error => {
                             console.log(error.response.data);
-                            alert(error.response.data.message);
+                            alert(error.response.data.message);                            
                         });
                 } else {
                     axios
@@ -150,10 +151,14 @@ export default {
                             console.log(response);
                             localStorage.setItem("auth", "ture");
                             this.$router.push("/threads");
+                            this.$router.go({ path: "/threads", force: true });
+
                         })
                         .catch(error => {
                             console.log(error.response.data);
-                            alert(error.response.data.message);
+                            if(error.response.data.message == "The given data was invalid.") {
+                                alert('メールアドレスもしくはパスワードが正しくありません。');
+                            }
                         });
                 }
             });

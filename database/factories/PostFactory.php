@@ -30,7 +30,6 @@ class PostFactory extends Factory
             'thread_id' => Thread::factory(),
             'displayed_post_id' => $this->faker->numberBetween(10, 1000),
             'body' => $this->faker->realText(60),
-            'has_image' => '1',
             'is_edited' => '0',
         ];
     }

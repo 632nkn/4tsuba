@@ -15,18 +15,22 @@ import ThreadsComponent from "./components/thread/ThreadsComponent";
 import PostsComponent from "./components/post/PostsComponent";
 import SearchResultsComponent from "./components/post/SearchResultsComponent";
 //users
-import ProfileComponent from "./components/users/ProfileComponent.vue"
+import ProfileComponent from "./components/users/ProfileComponent.vue";
 //Auth
 import RegisterComponent from "./components/auth/RegisterComponent";
 import LoginComponent from "./components/auth/LoginComponent";
 import LogoutComponent from "./components/auth/LogoutComponent";
 //setting account
 import SettingProfileComponent from "./components/setting/SettingProfileComponent";
-import SettingPersonalComponent from "./components/setting/SettingPersonalComponent";
+import SettingAccountComponent from "./components/setting/SettingAccountComponent";
+import SettingDeleteComponent from "./components/setting/SettingDeleteComponent";
 //setting mute_words
 import MuteWordsComponent from "./components/mute_word/MuteWordsComponent";
 //setting mute_users
 import MuteUsersComponent from "./components/mute_user/MuteUsersComponent";
+import axios from "axios";
+//not found
+import NotFoundComponent from "./components/common/NotFoundComponent";
 
 //URLと↑でimportしたコンポーネントをマッピングする（ルーティング設定
 const router = new VueRouter({
@@ -84,23 +88,55 @@ const router = new VueRouter({
             component: ThreadsComponent,
          },
          {
-            path: '/threads/:thread_id',
-            name: 'thread.show',
-            component: PostsComponent,
-            props: true
-         },
-         {
             path: '/threads/:thread_id/responses/:displayed_post_id',
             name: 'thread.responses',
             component: PostsComponent,
-            props: true
+            props: true,
+            //ページ遷移前に存在チェックしてエラーハンドリング
+            beforeEnter: (to, from, next) => {
+               axios.get("/api/exists/threads/" + to.params.thread_id + "/responses/" + to.params.displayed_post_id).then((res) => {
+                  console.log('this is beforeEnter(threads/:thread_id/responses/displayed_post_id)');
+                  console.log(res.data);
+                  if(res.data !== 0) {
+                     next();
+                  } else {
+                  next({path: '/404'});
+                  }
+                  next();
+               }).catch((error) =>{
+                  console.log(error);
+                  next({path: '/404'});
+               });
+            },
+         },
+         {
+            path: '/threads/:thread_id',
+            name: 'thread.show',
+            component: PostsComponent,
+            props: true,
+            //ページ遷移前に存在チェックしてエラーハンドリング
+            beforeEnter: (to, from, next) => {
+               axios.get("/api/exists/threads/" + to.params.thread_id).then((res) => {
+                  console.log('this is beforeEnter(threads/:thread_id)');
+                  console.log(res.data);
+                  if(res.data !== 0) {
+                     next();
+                  } else {
+                  next({path: '/404'});
+                  }
+                  next();
+               }).catch((error) =>{
+                  console.log(error);
+                  next({path: '/404'});
+               });
+            },
          },
          //posts
          {
             path: '/posts/:search_string',
             name: 'posts.search',
             component: SearchResultsComponent,
-            props: true
+            props: true,
          },
 
          //users
@@ -108,19 +144,45 @@ const router = new VueRouter({
             path: '/users/:user_id/posts',
             name: 'user.posts',
             component: ProfileComponent,
-            props: true
+            props: true,
+            //ページ遷移前に存在チェックしてエラーハンドリング
+            beforeEnter: (to, from, next) => {
+               axios.get("/api/exists/users/" + to.params.user_id).then((res) => {
+                  console.log('this is beforeEnter(users/:user_id/)');
+                  console.log(res.data);
+                  if(res.data !== 0) {
+                     next();
+                  } else {
+                  next({path: '/404'});
+                  }
+                  next();
+               }).catch((error) =>{
+                  console.log(error);
+                  next({path: '/404'});
+               });
+            },
          },
          {
             path: '/users/:user_id/likes',
             name: 'user.likes',
             component: ProfileComponent,
-            props: true
-         },
-         {
-            path: '/users/:user_id/threads',
-            name: 'user.threads',
-            component: ProfileComponent,
-            props: true
+            props: true,
+            //ページ遷移前に存在チェックしてエラーハンドリング
+            beforeEnter: (to, from, next) => {
+               axios.get("/api/exists/users/" + to.params.user_id).then((res) => {
+                  console.log('this is beforeEnter(users/:user_id/)');
+                  console.log(res.data);
+                  if(res.data !== 0) {
+                     next();
+                  } else {
+                  next({path: '/404'});
+                  }
+                  next();
+               }).catch((error) =>{
+                  console.log(error);
+                  next({path: '/404'});
+               });
+            },
          },
          //setting
          {
@@ -129,9 +191,14 @@ const router = new VueRouter({
             component: SettingProfileComponent,
          },
          {
-            path: '/setting/account/personal',
-            name: 'setting.personal',
-            component: SettingPersonalComponent,
+            path: '/setting/account/account',
+            name: 'setting.account',
+            component: SettingAccountComponent,
+         },
+         {
+            path: '/setting/account/delete',
+            name: 'setting.delete',
+            component: SettingDeleteComponent,
          },
          //ミュートワード
          {
@@ -145,6 +212,12 @@ const router = new VueRouter({
             name: 'setting.mute_users',
             component: MuteUsersComponent,
          },
+         //not found
+         {
+            path: '*',
+            name: 'not_found',
+            component: NotFoundComponent,
+         }
    ] 
    
 });
@@ -167,7 +240,6 @@ router.beforeEach((to, from, next) => {
    } else if (to.matched.some(record => record.meta.forGuest)) {
        if (isLoggedIn()) {
            alert('すでにログイン済みです。');
-           next("/threads");
        } else {
            next();
        }

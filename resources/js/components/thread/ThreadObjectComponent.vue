@@ -19,9 +19,14 @@
                     <span v-html="thread.post_count"></span>
                     <v-icon>mdi-heart</v-icon>
                     <span v-html="thread.like_count"></span>
-                    <span
-                        v-html="'(最終更新：' + thread.updated_at + ')'"
-                    ></span>
+                    <span class="d-flex d-sm-inline">
+                        <v-icon>mdi-update</v-icon>
+                        <span v-html="thread.updated_at"></span>
+                    </span>
+                    <span v-if="my_info.role === 'staff'" class="d-flex d-sm-inline">
+                        <v-icon @click="deleteThread">mdi-delete</v-icon>
+                    </span>
+
                 </v-card-text>
             </div>
         </div>
@@ -35,6 +40,44 @@ export default {
             type: Object,
             default: null,
             required: true
+        },
+        my_info: {
+            type:Object,
+            require  : true,
+            'default': () => ({ count: 0 })             
+        }
+    },
+    methods: {
+        getMyInfo() {
+            console.log("this is getMyInfo");
+            axios.get("/api/users/me/info").then(res => {
+                this.my_info = res.data;
+            });
+        },
+        deleteThread() {
+            console.log("this is deletePost");
+
+            if (confirm("スレッドを削除しますか？")) {
+                axios
+                    .delete("/api/threads", {
+                        data: {
+                            id: this.thread.id,
+                        }
+                    })
+                    .then(response => {
+                        console.log(response.data);
+                        if(response.data === 'bad_user') {
+                            alert('スタッフ以外は削除できません。');
+                        } else {
+                            alert('削除しました。');
+
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response.data);
+                    });
+            }
+
         }
     }
 };

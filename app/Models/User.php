@@ -9,6 +9,9 @@ use Illuminate\Notifications\Notifiable;
 //Laravel Sanctum APIトークン？
 use Laravel\Sanctum\HasApiTokens;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
 
 
 class User extends Authenticatable
@@ -27,7 +30,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $hidden = ['email', 'email_verified_at', 'password', 'remember_token',];
+    protected $hidden = ['created_at', 'updated_at', 'email', 'email_verified_at', 'password', 'remember_token', 'icon_size'];
 
     /**
      * The attributes that should be cast to native types.
@@ -66,5 +69,12 @@ class User extends Authenticatable
     public function mute_users()
     {
         return $this->hasMany(MuteUser::class);
+    }
+
+    public function checkPassword(String $typed_password)
+    {
+
+        $password = Auth::user()->password;
+        return Hash::check($typed_password, $password);
     }
 }

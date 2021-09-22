@@ -1,36 +1,28 @@
 <template>
-<div>
-    <!-- ログイン -->
-    <auth-component></auth-component>
+    <div>
+        <!-- ログイン -->
+        <auth-component></auth-component>
 
-    <!-- ゲストログイン -->
-    <v-card flat >
-        <v-card-title class="green--text text--lighten-1">ゲストログイン</v-card-title>
-    </v-card>
-    <div class="d-flex justify-end">
-        <v-btn
-            class="white--text mt-3 mr-3"
-            color="green lighten-2"
-            depressed
-            @click="loginAsGuest1"
-        >ゲストユーザー1でログイン
-        </v-btn>
-        <v-btn
-            class="white--text mt-3 mr-3"
-            color="green lighten-2"
-            depressed
-            @click="loginAsGuest2"
-        >ゲストユーザー2でログイン
-        </v-btn>
-        <v-btn
-            class="white--text mt-3 mr-3"
-            color="green lighten-2"
-            depressed
-            @click="loginAsGuest3"
-        >ゲストユーザー3でログイン
-        </v-btn>
+        <!-- ゲストログイン -->
+        <v-card flat>
+            <v-card-title class="green--text text--lighten-1"
+                >ゲストログイン</v-card-title
+            >
+        </v-card>
+        <v-container>
+            <v-row no-gutters>
+                <v-col v-for="n in 3" :key="n" cols="12" md="4">
+                    <v-btn
+                        class="white--text mt-3 mr-3"
+                        color="green lighten-2"
+                        depressed
+                        @click="loginAsGuest(n)"
+                        >ゲストユーザー{{ n }}でログイン
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </v-container>
     </div>
-</div>
 </template>
 
 <script>
@@ -38,57 +30,28 @@ import AuthComponent from "./AuthComponent.vue";
 
 export default {
     data() {
-        return {
-            guest_user_id: null
-        };
+        return {};
     },
     components: {
-        AuthComponent,
+        AuthComponent
     },
     methods: {
-        loginAsGuest1() {
-            console.log('this is loginAsGuest1');
+        loginAsGuest($user_id) {
+            console.log("this is loginAsGuest");
+            console.log($user_id);
             axios
-                .get("/api/login/guest/1")
+                .get("/api/login/guest/" + $user_id)
                 .then(response => {
                     console.log(response);
                     localStorage.setItem("auth", "ture");
                     this.$router.push("/threads");
+                    this.$router.go({ path: "/threads", force: true });
                 })
                 .catch(error => {
                     console.log(error.response.data);
                     alert(error.response.data.message);
                 });
-        },
-        loginAsGuest2() {
-            console.log('this is loginAsGuest2');
-            axios
-                .get("/api/login/guest/2")
-                .then(response => {
-                    console.log(response);
-                    localStorage.setItem("auth", "ture");
-                    this.$router.push("/threads");
-                })
-                .catch(error => {
-                    console.log(error.response.data);
-                    alert(error.response.data.message);
-                });
-        },
-        loginAsGuest3() {
-            console.log('this is loginAsGuest3');
-            axios
-                .get("/api/login/guest/3")
-                .then(response => {
-                    console.log(response);
-                    localStorage.setItem("auth", "ture");
-                    this.$router.push("/threads");
-                })
-                .catch(error => {
-                    console.log(error.response.data);
-                    alert(error.response.data.message);
-                });
-        },
-       
+        }
     }
 };
 </script>

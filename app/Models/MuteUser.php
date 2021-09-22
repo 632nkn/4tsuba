@@ -14,6 +14,8 @@ class MuteUser extends Model
     protected $fillable = [
         'muting_user_id', 'user_id'
     ];
+    protected $hidden = ['created_at', 'updated_at'];
+
 
     //リレーション定義
     public function user()

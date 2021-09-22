@@ -1,60 +1,44 @@
 <template>
     <div class="p-5">
-        <h1>Laravel Airlock</h1>
-        <button class="btn btn-danger mb-3" @click="logout">ログアウト</button>
-                <v-btn
-                    class="white--text"
-                    color="green lighten-2"
-                    depressed
-                    @click="logout"
-                >
-                    はい
-                </v-btn>
+
+    <v-card flat >
+        <v-row>
+            <v-col cols="1"></v-col>
+        <v-card-title class="grey--text text--darken-2">ログアウトしますか？</v-card-title>
+        </v-row>
+        <v-row>
+            <v-col cols="6"></v-col>
+        <v-btn
+            class="white--text"
+            color="green lighten-2"
+            depressed
+            @click="logout"
+        >
+        はい
+        </v-btn>
+        </v-row>
+    </v-card>
 
     </div>
 </template>
 
 <script>
-// export default {
-//     data() {
-//         return {
-//             email: "",
-//             password: "",
-//             errors: []
-//         };
-//     },
-//     methods: {
-//         login() {
-//             axios.get("/sanctum/csrf-cookie").then(response => {
-//                 axios
-//                     .post("/api/login", {
-//                         email: this.email,
-//                         password: this.password
-//                     })
-//                     .then(response => {
-//                         console.log('ログインメソッド成功');
-//                         console.log(response);
-//                         localStorage.setItem("auth", "ture");
-//                         this.$router.push("/about");
-//                     })
-//                     .catch(error => {
-//                 console.log(error);
-//                 console.log('ログイン失敗のキャッチ');
-//             });
-//             });
-//         }
-//     }
-// };
 export default {
     data() {
         return {};
     },
     methods: {
         logout() {
-            axios.post("/api/logout", {}).then(response => {
+            axios.post("/api/logout", {})
+            .then(response => {
                 console.log(response);
                 localStorage.removeItem("auth");
                 this.$router.push("/login");
+                this.$router.go({path: "/login", force: true});
+            })
+            .catch(error => {
+                console.log(error.response.data);
+                alert(error.response.data.message);
             });
         }
     }

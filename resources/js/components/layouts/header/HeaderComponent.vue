@@ -1,42 +1,95 @@
 <template>
     <div>
-        <v-app-bar color="green lighten-1" app dense dark prominent>
-            <v-row  justify="center" align-content="baseline">
-
-            <v-toolbar-title class="mb-10">よつば</v-toolbar-title>
-
-            <v-spacer></v-spacer>
-
-            <v-text-field
-                class="mt-5"
-                label="書き込みに含まれる単語を検索"
-                value="(渋谷 OR 代々木) ランチ"
-                hint="AND検索、OR検索に対応しています"
-                outlined
-            ></v-text-field>
-
-            <v-btn icon class="mt-5">
-                <v-icon large >mdi-magnify</v-icon>
-            </v-btn>
-
-            <v-btn icon class="mt-5">
-                <v-icon large>mdi-login-variant</v-icon>
-            </v-btn>
-
-            <v-menu left bottom >
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon v-bind="attrs" v-on="on" class="mt-5">
-                        <v-icon large>mdi-dots-vertical</v-icon>
+        <v-app-bar  color="white" app flat outlined clipped-left height="80" class="green--text" >
+            <v-toolbar-title>
+                <span class="d-none d-sm-inline">よつば</span>
+                <v-icon class="d-sm-none  mr-3 mb-2" color="green lighten-2">mdi-clover</v-icon>
+            </v-toolbar-title>
+            <v-spacer class="d-none d-sm-inline"></v-spacer>
+            <!-- 検索バー PC用 -->
+                <v-text-field
+                    class="mt-5"
+                    dense
+                    color="green lighten-2"
+                    label="書き込みに含まれる単語を検索"
+                    placeholder="単語1 単語2"
+                    hint="複数単語はOR検索になります"
+                    outlined
+                    v-model="search_string"
+                >
+                </v-text-field>
+                <router-link 
+                    style="text-decoration: none;"
+                    v-bind:to="'/posts/' + search_string"
+                >            
+                    <v-btn
+                        icon
+                        class="white--text"
+                        color="green lighten-2"
+                        depressed
+                    >
+                        <v-icon>mdi-magnify</v-icon>
                     </v-btn>
-                </template>
-
-                <v-list>
-                    <v-list-item v-for="n in 5" :key="n" @click="() => {}">
-                        <v-list-item-title>Option {{ n }}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-            </v-row>
+                </router-link>
+            <v-toolbar-items >
+                <v-btn text to="/login" class="grey--text">
+                <v-icon>mdi-login</v-icon>
+                <span class="d-none d-sm-inline">ログイン</span>
+            </v-btn>
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                        <v-btn v-on="on" text class="grey--text">
+                            <span class="d-none d-sm-inline">その他</span>
+                            <v-icon>mdi-menu-down</v-icon></v-btn
+                        >
+                    </template>
+                    <v-list>
+                        <v-list-item
+                            v-for="other in others"
+                            :key="other.name"
+                            :to="other.link"
+                        >
+                            <v-list-item-icon>
+                                <v-icon>{{ other.icon }}</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>{{
+                                    other.name
+                                }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
         </v-app-bar>
     </div>
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            search_string: null,
+            others: [
+                {
+                    name: "よつばとは？",
+                    icon: "mdi-vuetify",
+                    link: "/introduction"
+                },
+                {
+                    name: "ユーザー登録",
+                    icon: "mdiaccount-plus",
+                    link: "/register"
+                },
+                {
+                    name: "作者Github",
+                    icon: "mdi-github-face",
+                    link: "/guthub-issue-board"
+                },
+            ],
+        };
+    },
+    methods: {
+    },
+};
+</script>

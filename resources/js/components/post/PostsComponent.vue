@@ -1,4 +1,5 @@
 <template>
+
     <div>
         <!-- スレッドタイトル部分 -->
         <div @click="getPosts" style="cursor: pointer;">
@@ -6,16 +7,25 @@
             v-bind:thread="thread"
         ></thread-object-component>
         </div>
+        <v-btn @click="showImages"></v-btn>
+        <!-- Light Box -->
+        <light-box
+            ref="lightbox"
+            :media="media"
+            :show-light-box="false"
+            :show-caption="true"
+        ></light-box>
 
         <!-- ポスト部分 -->
         <div v-for="(post, index) in posts" :key="post.id">
             <post-object-component
                 v-bind:post="post"
                 v-bind:index="index"
-                v-bind:my_id="my_id"
+                v-bind:my_info="my_info"
                 @receiveUpdate="updateEntry"
                 @receiveForResponses="getResponses"
                 @receiveForAnchor="transferAnchor"
+                @receiveForLightBox="showImages"
             >
             </post-object-component>
         </div>
@@ -23,6 +33,7 @@
         <v-divider></v-divider>
         <!-- 書き込み部分 -->
         <create-component @receiveInput="storePost" v-bind:anchor="anchor"></create-component>
+        <span ref="bottom"></span>
     </div>
 </template>
 
@@ -30,12 +41,13 @@
 import ThreadObjectComponent from "../thread/ThreadObjectComponent.vue";
 import PostObjectComponent from "./PostObjectComponent.vue";
 import CreateComponent from "../common/CreateComponent.vue";
+import LightBox from 'vue-image-lightbox';
 
 export default {
     //このpropsは親コンポーネントではなく、router-linkのparam
     props: {
         thread_id: {
-            type: Number,
+            type: String,
             default: 1,
             required: true
         },
@@ -46,17 +58,18 @@ export default {
     },
     data() {
         return {
-            my_id: 0,
+            my_info: {},
             thread: {},
             posts: {},
-            anchor: null
+            anchor: null,
+            media: [],
         };
     },
     methods: {
-        getMyId() {
-            console.log("this is getMyId");
-            axios.get("/api/users/me").then(res => {
-                this.my_id = res.data;
+        getMyInfo() {
+            console.log("this is getMyInfo");
+            axios.get("/api/users/me/info").then(res => {
+                this.my_info = res.data;
             });
         },
         getThread() {
@@ -64,6 +77,18 @@ export default {
             axios.get("/api/threads/" + this.thread_id).then(res => {
                 this.thread = res.data;
             });
+        },
+        getPostsOrResponses() {
+            console.log('this is getPostsOrResponses');
+            let path = this.$route.path;
+            let displayed_post_id = path.match(/\d+$/)[0];
+            console.log(path);
+            console.log(displayed_post_id);
+            if(!path.match(/responses/)) {
+                this.getPosts();
+            } else {
+                this.getResponses(displayed_post_id);
+            }
         },
         getPosts() {
             console.log("this is getPosts");
@@ -111,7 +136,6 @@ export default {
                     console.log(response);
                     console.log("書き込み作成");
                     this.updateEntry();
-
                 })
                 .catch(error => {
                     console.log(error.response.data);
@@ -120,18 +144,38 @@ export default {
         updateEntry() {
             console.log('this is updateEntry');
             this.getPosts();
+            this.getImagesForLightBox();
             this.getThread();
+            this.scrollToEnd();
         },
+        scrollToEnd() {
+            console.log('this is scrollToEnd');
+            const el = this.$refs.bottom;
+            el.scrollIntoView({behavior: 'smooth'});
+        },
+        getImagesForLightBox() {
+            console.log('this is getImagesForLightBox');
+            axios
+                .get("/api/images/threads/" + this.thread_id)
+                .then(res => {
+                    this.media = res.data;
+                });
+        },
+        showImages(emitted_lightbox_index) {
+            this.$refs.lightbox.showImage(emitted_lightbox_index);
+        }
     },
     components: {
         ThreadObjectComponent,
         PostObjectComponent,
-        CreateComponent
+        CreateComponent,
+        LightBox,
     },
     mounted() {
-        this.getMyId();
+        this.getMyInfo();
         this.getThread();
         this.getPosts();
-    }
+        this.getImagesForLightBox();
+    },
 };
 </script>

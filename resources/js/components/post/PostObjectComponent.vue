@@ -16,24 +16,26 @@
                 v-bind:to="{name: 'thread.show', params: {thread_id: post.thread_id}}"
             >            
                 <div v-if="need_thread" class=" ml-1 mb-n2">
-                    スレッドID:{{post.thread_id}} / {{post.thread.title}}
+                    【スレッド】{{post.thread.title}}
                 </div>
             </router-link>
 
             <!-- １行目 -->
             <v-card-text class="d-flex">
-                <span v-html="post.displayed_post_id"></span>
-                <router-link 
+                <span v-text="post.displayed_post_id"></span>
+                <router-link
+                    v-if="post.user"
                     style="text-decoration: none;"
                     onMouseOut="this.style.textDecoration='none';" 
                     onMouseOver="this.style.textDecoration='underline';"                    
                     class="green--text text--lighten-1"
                     v-bind:to="{name: 'user.posts', params: {user_id: post.user_id}}"
                 >
-                    <span v-html="post.user.name" class="ml-3"></span>
+                    <span v-text="post.user.name" class="ml-3"></span>
                 </router-link>
+                <span v-else class="ml-3">退会済みユーザー</span>
 
-                <span v-html="post.created_at" class="ml-3"></span>
+                <span v-text="post.created_at" class="ml-3"></span>
                 <span v-if="post.is_edited" class=" ml-3 blue-grey--text">(編集済み)</span>
 
                 <v-spacer></v-spacer>
@@ -59,7 +61,7 @@
                         <span>返信</span>
                     </v-tooltip>
                 </template>
-                <template v-if="post.user_id === my_id">
+                <template v-if="post.user_id === my_info.id || my_info.role === 'staff'">
                     <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                             <span v-on="on"
@@ -87,20 +89,22 @@
 
             <!-- ２行目 -->
             <div class="d-flex mt-n10">
-                <template v-if="post.image">
+                <template v-if="post.image" >
                     <v-avatar class="ma-3" size="250" tile>
                         <!-- vueのルート publicディレクトリからの相対パスを記入する この場合 public/storage/images/example.png -->
                         <img
                             :src="'/storage/images/' + post.image.image_name"
-                            style="object-fit: contain;"
+                            style="object-fit:contain; cursor:zoom-in;"
+                            @click="emitForLightBox"
                         />
                     </v-avatar>
                 </template>
                 <v-card-text>
                     <div v-if="!is_editing">
-                        <span v-if="!search"> {{post.body}}</span>
-                        <span v-else v-html="post.body_for_search"></span>
+                        <span v-if="!search" style="white-space:pre-wrap; word-wrap:break-word;" v-text="post.body"></span>
+                        <span v-else style="white-space:pre-wrap; word-wrap:break-word;" v-html="post.body_for_search"></span>
                     </div>
+                    <!-- 編集中 -->
                     <template v-else>
                         <v-form ref="form" v-model="valid" class="pa-4 ">
                             <v-textarea
@@ -115,12 +119,19 @@
                                 :rules="[rules.required, rules.length_body]"
                             ></v-textarea>
                             <!-- 画像 -->
-                            <v-file-input v-if="post.image"
+                            <template v-if="post.image">
+                            <v-file-input 
                                 v-model="post.image"
                                 color="green lightten-2"
                                 accept="image/png, image/gif, image/jpg, image/jpeg"
                                 label="画像を変更"
                             ></v-file-input>
+                            <v-checkbox
+                            label="画像を削除する"
+                            color="green lighten-2"
+                            v-model="post.delete_image"
+                            ></v-checkbox>
+                            </template>
                             <v-file-input v-else
                                 v-model="post.image"
                                 color="green lightten-2"
@@ -171,7 +182,7 @@
     <v-card v-else-if="post.deleted_at === null && post.has_mute_words === true" color="blue-grey lighten-5" outlined class="my-3">
         <!-- 1行目 -->
         <v-card-text class="d-flex">
-            <span v-html="post.displayed_post_id"></span>
+            <span v-text="post.displayed_post_id"></span>
             <span class="ml-3">
                 <router-link
                     v-bind:to="{
@@ -216,7 +227,7 @@
     <v-card v-else-if="post.deleted_at === null && post.posted_by_mute_users === true" color="blue-grey lighten-5" outlined class="my-3">
         <!-- 1行目 -->
         <v-card-text class="d-flex">
-            <span v-html="post.displayed_post_id"></span>
+            <span v-text="post.displayed_post_id"></span>
             <span class="ml-3">
                 <router-link
                     v-bind:to="{
@@ -261,7 +272,7 @@
     <v-card v-else color="blue-grey lighten-5" outlined class="my-3">
         <!-- 1行目 -->
         <v-card-text class="d-flex">
-            <span v-html="post.displayed_post_id"></span>
+            <span v-text="post.displayed_post_id"></span>
             <span class="ml-3">書込者が削除しました。</span>
             <!-- 削除済みコメントにはいいねボタンを表示しない。 
             ただし、いいねした後削除したときのみいいねボタンを表示する(はずせるようにするため)。 -->
@@ -311,8 +322,8 @@ export default {
             type: Number,
             required: true
         },
-        my_id: {
-            type: Number,
+        my_info: {
+            type: Object,
             required: true
         },
         need_thread: {
@@ -410,26 +421,26 @@ export default {
             form_data.append("id", this.post.id);
             form_data.append("displayed_post_id", this.post.displayed_post_id);
             form_data.append("body", this.post.body);
-            if(this.post.image !== null) {
-            form_data.append("image", this.post.image);
+            if(this.post.delete_image ) {
+                form_data.append("delete_image", this.post.delete_image)
             }
-            //form_data.append('_method', 'PATCH');
+            if(this.post.image !== null) {
+                form_data.append("image", this.post.image);
+            }
             console.log(form_data);
-            // const header = {
-            //     headers: {
-            //         'Content-Type': 'multipart/form-data',
-            //         //'X-HTTP-Method-Override': 'PATCH'
-            //     },
-            // };
-            // header.headers['X-HTTP-Method-Override'] = 'PATCH';
             axios
                 .post("/api/posts/edit", form_data, {
                     headers: { "content-type": "multipart/form-data" }
                 })
                 .then(response => {
-                    console.log(response);
-                    this.$emit("receiveUpdate");
-                    this.post.is_edited = 1;
+                        if(response.data == 'bad_user') {
+                            console.log(response);
+                            alert('書込者以外は編集できません。');
+                        } else {
+                            this.post.is_edited = 1;
+                        }
+                        this.$emit("receiveUpdate");
+
                 })
                 .catch(error => {
                     console.log(error.response.data);
@@ -463,14 +474,17 @@ export default {
                         data: {
                             id: this.post.id,
                             thread_id: this.post.thread_id,
-                            user_id: this.post.user_id
+                            user_id: this.post.user_id,
                         }
                     })
                     .then(response => {
-                        console.log(response);
-                        console.log("書込削除");
-                        this.post.deleted_at = 'deleted';
-                        this.$emit("receiveUpdate");
+                        console.log(response.data);
+                        if(response.data === 'bad_user') {
+                            alert('書込者以外は削除できません。');
+                        } else {
+                            this.post.deleted_at = 'deleted';
+                            this.$emit("receiveUpdate");
+                        }
                     })
                     .catch(error => {
                         console.log(error.response.data);
@@ -484,6 +498,10 @@ export default {
         emitForAnchor() {
             console.log('this is emitForAnchor★'+ this.post.displayed_post_id);
             this.$emit("receiveForAnchor", this.post.displayed_post_id);
+        },
+        emitForLightBox() {
+            console.log('this is emitForLightBox emit ' + this.post.lightbox_index);
+            this.$emit("receiveForLightBox", this.post.lightbox_index);
         }
     },
 };

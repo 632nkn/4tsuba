@@ -1,56 +1,226 @@
 <template>
-<div>
-    <v-card height="100">
-    </v-card>
-    <v-card >
+    <div>
         <v-navigation-drawer
-            v-model="drawer"
-            :mini-variant.sync="mini"
+            app
+            nav
             permanent
+            clipped
+            :mini-variant="mini"
+            mini-variant-width="60"
         >
-            <v-list-item class="px-2">
-                <v-list-item-avatar>
-                    <v-img
-                        src="https://randomuser.me/api/portraits/men/85.jpg"
-                    ></v-img>
-                </v-list-item-avatar>
+            <v-container>
+                <!-- アバター部分 -->
+                <template v-if="my_info">
+                    <v-list-item color="green lighten-2" :to="'/users/' + my_info['id'] + '/posts'">
+                            <v-list-item-avatar size="50" tile>
+                                <img
+                                    :src="'/storage/icons/' + my_info.icon_name"
+                                    style="object-fit: cover;"
+                                />
+                            </v-list-item-avatar>
+                            <v-list-item-content>
+                                <v-list-item-title class="green-text">
+                                    {{ my_info.name}}
+                                </v-list-item-title>
+                                <v-list-item-subtitle>
+                                    {{my_info.email}}
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                    </v-list-item>
+                </template>
+                <v-divider></v-divider>
 
-                <v-list-item-title>John Leider</v-list-item-title>
+                <!-- リスト部分 -->
+                <v-list dense>
+                    <template v-for="nav_list in nav_lists">
+                        <!-- リストがサブリストを持たない場合 -->
+                        <v-list-item
+                            color="green lighten-2"
+                            v-if="!nav_list.lists"
+                            :to="nav_list.link"
+                            :key="nav_list.name"
+                        >
+                            <v-list-item-icon>
+                                <v-icon>{{ nav_list.icon }}</v-icon>
+                                <v-badge
+                                    v-if="nav_list.notification"
+                                    :content="nav_list.notification"
+                                    :value="nav_list.notification"
+                                    color="green lighten-2"
+                                    overlap
+                                >
+                                </v-badge>
 
-                <v-btn icon @click.stop="mini = !mini">
-                    <v-icon>mdi-chevron-left</v-icon>
-                </v-btn>
-            </v-list-item>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    {{ nav_list.name }}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
 
-            <v-divider></v-divider>
-
-            <v-list dense>
-                <v-list-item v-for="item in items" :key="item.title" link>
-                    <v-list-item-icon>
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </v-list-item-icon>
-
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
+                        <!-- リストがサブリストを持つ場合 -->
+                        <v-list-group
+                            color="green lighten-2"
+                            v-else
+                            no-action
+                            :prepend-icon="nav_list.icon"
+                            :key="nav_list.name"
+                        >
+                            <template v-slot:activator>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ nav_list.name }}
+                                    </v-list-item-title>
+                                </v-list-item-content>
+                            </template>
+                            <v-list-item
+                                v-for="list in nav_list.lists"
+                                :key="list.name"
+                                :to="list.link"
+                            >
+                                <v-list-item-title>
+                                    {{ list.name }}
+                                </v-list-item-title>
+                            </v-list-item>
+                        </v-list-group>
+                    </template>
+                </v-list>
+            </v-container>
         </v-navigation-drawer>
-    </v-card>
     </div>
 </template>
 
 <script>
 export default {
-  name: 'App',
-  data: () => ({
-    items: [
-      { title: 'Index', icon: 'mdi-web', url: '/' },
-      { title: 'Home', icon: 'mdi-home', url: '/home' },
-      { title: 'Favorites', icon: 'mdi-heart', url: '/favorites' },
-      { title: 'About', icon: 'mdi-information-variant', url: '/about' }
-    ]
-  })
-}
+    data() {
+        return {
+            my_info: null,
+            mini: true,
+            nav_lists: [
+                {
+                    name: "スレッド一覧",
+                    icon: "mdi-clipboard-text-multiple",
+                    link: "/threads"
+                },
+                {
+                    name: "スレッド作成",
+                    icon: "mdi-plus-thick",
+                    link: "/threads/create"
+                },
+                {
+                    name: "設定",
+                    icon: "mdi-cogs",
+                    lists: [
+                        {
+                            name: "ミュートワード",
+                            link: "/setting/mute_words"
+                        },
+                        {
+                            name: "ミュートユーザー",
+                            link: "/setting/mute_users"
+                        },
+                        {
+                            name: "マイプロフィール",
+                            link: "/setting/account/profile"
+                        }
+                    ]
+                },
+                {
+                    name: "ログアウト",
+                    icon: "mdi-logout",
+                    link: "/logout"
+                }
+            ]
+        };
+    },
+    methods: {
+        getMyInfo() {
+            console.log("this is getMyInfo");
+            axios.get("/api/users/me/info").then(res => {
+                this.my_info = res.data;
+            });
+        },
+        handleResize: function() {
+            if (window.innerWidth <= 960) {
+                this.mini = true;
+            } else {
+                this.mini = false;
+            }
+        },
+        switchNavLists() {
+            if(this.mini) {
+                console.log(this.mini);
+                //delete this.nav_lists[2];
+                this.nav_lists.splice(2,2,
+                    {
+                    name: "ミュートワード",
+                    icon: "mdi-alphabetical-variant-off",
+                    link: "/setting/mute_words"
+                    },
+                    {
+                    name: "ミュートユーザー",
+                    icon: "mdi-account-off-outline",
+                    link: "/setting/mute_users"
+                    },
+                    {
+                    name: "マイプロフィール",
+                    icon: "mdi-account-edit",
+                    link: "/setting/account/profile"
+                    },
+                    {
+                        name: "ログアウト",
+                        icon: "mdi-logout",
+                        link: "/logout"
+                    }
+                )
+            } else {
+                console.log(this.mini);
+                this.nav_lists.splice(2,4,
+                    {
+                        name: "設定",
+                        icon: "mdi-cogs",
+                        lists: [
+                            {
+                                name: "ミュートワード",
+                                link: "/setting/mute_words"
+                            },
+                            {
+                                name: "ミュートユーザー",
+                                link: "/setting/mute_users"
+                            },
+                            {
+                                name: "マイプロフィール",
+                                link: "/setting/account/profile"
+                            }
+                        ]
+                    },
+                    {
+                        name: "ログアウト",
+                        icon: "mdi-logout",
+                        link: "/logout"
+                    }
+                )
+            }
+        },
+    },
+    created() {
+        window.addEventListener("resize", this.handleResize);
+        this.handleResize();
+    },
+    destroyed() {
+        window.removeEventListener("resize", this.handleResize);
+    },
+    watch: {
+        mini: function() {
+            this.switchNavLists();
+        }
+    },
+
+    mounted() {
+        this.getMyInfo();
+        this.switchNavLists();
+    },
+};
 </script>
 

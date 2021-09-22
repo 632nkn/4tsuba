@@ -10,9 +10,11 @@ use App\Models\Like;
 use App\Models\MuteWord;
 use App\Models\MuteUser;
 use App\Models\Gatekeeper;
+use App\Models\User;
 //authを使用する
 use Illuminate\Support\Facades\Auth;
-
+//認可gateを使用する
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -28,17 +30,12 @@ class PostController extends Controller
         //select(*)ないと外部結合した列がでなくなるので注意
         $query = Post::query();
         $query->select('*')->with(['thread', 'image', 'user',])
-            //  1がnullになるときがあるバグ
-            // ->leftJoinSub($login_user_post_table, 'login_user_post_table', function ($join) {
-            //     $join->on('posts.id', '=', 'login_user_post_table.login_user_posted_post_id');
-            // })
             ->withCount([
                 'likes',
                 'likes AS login_user_liked' => function ($query) {
                     $query->where('user_id', Auth::id());
                 },
-            ])
-            ->whereNotNull('user_id');
+            ]);
         //スレッド
         if ($request->where == 'thread_id') {
             //スレッド内の返信関係を取得 thread_idを特定しないと掴みようがないため、この位置
@@ -97,24 +94,21 @@ class PostController extends Controller
         $mute_user = new MuteUser();
         $posts = $mute_user->addPostedByMuteUsersKeyToPosts($posts);
 
-        //これがなぜかできない
-        //$post = $post->only(['displayed_post_id', 'id']);
+
+        $lightbox_index = 0;
         foreach ($posts as $post) {
+            //削除済み書込の見せたくないプロパティをマスク
             if ($post['deleted_at'] != null) {
-                unset(
-                    $post['created_at'],
-                    $post['updated_at'],
-                    $post['user_id'],
-                    $post['body'],
-                    $post['has_image'],
-                    $post['is_edited'],
-                    $post['like_count'],
-                    $post['posted_by_mute_users'],
-                    $post['thread'],
-                    $post['image'],
-                    $post['user'],
-                    $post['has_mute_words']
-                );
+                $post->makeHidden([
+                    'created_at', 'updated_at', 'user_id', 'body',
+                    'is_edited', 'like_count', 'posted_by_mute_users', 'thread',
+                    'image', 'user', 'has_mute_words'
+                ]);
+            }
+            //lightboxのためのインデックスを付与
+            else if ($post['image']) {
+                $post['lightbox_index'] = $lightbox_index;
+                $lightbox_index++;
             }
         }
         return $posts;
@@ -150,7 +144,6 @@ class PostController extends Controller
             'thread_id' => $request->thread_id,
             'displayed_post_id' => $request->displayed_post_id,
             'body' => $checked_body,
-            'has_image' => $request->hasFile('image'),
         ]);
 
         //スレッドのpost_countをインクリメント
@@ -158,7 +151,7 @@ class PostController extends Controller
         $post->thread()->increment('post_count');
 
         //画像があれば
-        if ($post->has_image) {
+        if ($request->hasFile('image')) {
             $request->merge([
                 'post_id' => $post->id,
             ]);
@@ -171,30 +164,39 @@ class PostController extends Controller
     //ポスト更新
     public function edit(Request $request)
     {
-        //NGワード置換
-        $gate_keeper = new GateKeeper();
-        $checked_body = $gate_keeper->convertNgWordsIfExist($request->body);
+        $target_post = Post::find($request->id);
+        $response = Gate::inspect('delete', $target_post);
 
-        Post::where('id', $request->id)->where('user_id', Auth::id())
-            ->update([
+        if ($response->allowed()) {
+            //NGワード置換
+            $gate_keeper = new GateKeeper();
+            $checked_body = $gate_keeper->convertNgWordsIfExist($request->body);
+
+            $target_post->update([
                 'body' => $checked_body,
-                'has_image' => $request->hasFile('image'),
                 'is_edited' => 1,
             ]);
 
-        //一度返信関係をリセット  and 再取得
-        $response_controller = new ResponseController();
-        $response_controller->destroy($request);
-        //返信関係再登録
-        if (strpos($request->body, '>>') !== false) {
-            $response_controller->store($request);
-        }
+            //一度返信関係をリセット  and 再取得
+            $response_controller = new ResponseController();
+            $response_controller->destroy($request);
+            //返信関係再登録
+            if (strpos($request->body, '>>') !== false) {
+                $response_controller->store($request);
+            }
 
-
-        //画像があれば
-        if ($request->hasFile('image')) {
-            $image_controller = new ImageController();
-            $image_controller->edit($request);
+            //画像があれば
+            if ($request->hasFile('image')) {
+                $image_controller = new ImageController();
+                $image_controller->edit($request);
+            }
+            //編集前の画像削除の場合(画像変更の場合でも画像を削除にチェックしてたら画像を削除するからこの位置)
+            if ($request->delete_image) {
+                $image_controller = new ImageController();
+                $image_controller->destroy($target_post->id);
+            }
+        } else {
+            return $response->message();
         }
     }
 
@@ -202,9 +204,15 @@ class PostController extends Controller
     //ポスト削除
     public function destroy(Request $request)
     {
-        Post::where('user_id', Auth::id())->where('id', $request->id)->delete();
+        $target_post = Post::find($request->id);
+        $response = Gate::inspect('delete', $target_post);
 
-        $image_controller = new ImageController();
-        $image_controller->destroy($request->id);
+        if ($response->allowed()) {
+            $target_post->delete();
+            $image_controller = new ImageController();
+            $image_controller->destroy($request->id);
+        } else {
+            return $response->message();
+        }
     }
 }

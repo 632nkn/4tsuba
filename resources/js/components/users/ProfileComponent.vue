@@ -13,7 +13,7 @@
                 <v-toolbar-title class="green--text">{{ user_info.name }}</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <!-- 自分のプロフィールはプロフィール編集ボタン -->
-                <v-btn v-if="my_id == user_id"
+                <v-btn v-if="my_info.id == user_id"
                         class="white--text"
                         color="green lighten-2"
                         depressed
@@ -51,7 +51,6 @@
                         </template>
                         <span>ミュート解除</span>
                     </v-tooltip>
-
                 </template>
 
                 <template v-slot:extension>
@@ -75,6 +74,19 @@
                     </v-tabs>
                 </template>
             </v-toolbar>
+            <!-- Light Box -->
+            <light-box
+                ref="lightbox_for_post"
+                :media="posted_media"
+                :show-light-box="false"
+                :show-caption="true"
+            ></light-box>
+            <light-box
+                ref="lightbox_for_like"
+                :media="liked_media"
+                :show-light-box="false"
+                :show-caption="true"
+            ></light-box>
 
             <!-- タブ中身s -->
             <v-tabs-items v-model="tab">
@@ -86,8 +98,9 @@
                         <post-object-component
                             v-bind:post="post"
                             v-bind:index="index"
-                            v-bind:my_id="my_id"
+                            v-bind:my_info="my_info"
                             v-bind:need_thread="true"
+                            @receiveForLightBox="showImagesForPost"
                             ref="child"
                         >
                         </post-object-component>
@@ -104,9 +117,10 @@
                         <post-object-component
                             v-bind:post="post"
                             v-bind:index="index"
-                            v-bind:my_id="my_id"
+                            v-bind:my_info="my_info"
                             v-bind:need_thread="true"
                             @receiveTrueOrFalse="callUpdateTrueOrFalse"
+                            @receiveForLightBox="showImagesForLike"
                         >
                         </post-object-component>
                     </div>
@@ -125,17 +139,20 @@
 
 <script>
 import HeadlineComponent from "../common/HeadlineComponent.vue";
-import UserPostsComponent from "./UserPostsComponent.vue";
 import PostObjectComponent from "../post/PostObjectComponent.vue";
+import LightBox from 'vue-image-lightbox';
+
 export default {
     data() {
         return {
             headline: "ユーザープロフィール",
-            my_id: 0,
+            my_info: {},
             user_id: this.$route.params.user_id,
             user_info: {},
             user_posts: null,
             user_like_posts: null,
+            posted_media: [],
+            liked_media: [],
             tab: null,
             tabs: [
                 {
@@ -158,14 +175,14 @@ export default {
     },
     components: {
         HeadlineComponent,
-        UserPostsComponent,
-        PostObjectComponent
+        PostObjectComponent,
+        LightBox,
     },
     methods: {
-        getMyId() {
-            console.log("this is getMyId");
-            axios.get("/api/users/me").then(res => {
-                this.my_id = res.data;
+        getMyInfo() {
+            console.log("this is getMyInfo");
+            axios.get("/api/users/me/info").then(res => {
+                this.my_info = res.data;
             });
         },
         getUserInfo() {
@@ -178,6 +195,10 @@ export default {
             }).then(res => {
                 this.user_info = res.data[0];
             });
+        },
+        updateUserId() {
+            console.log('this is updateUserId');
+            this.user_id = this.$route.params.user_id;
         },
         getUserPosts() {
             console.log("this is getUserPosts");
@@ -258,7 +279,7 @@ export default {
         },
         //自分のプロフィールだった場合、「いいね」側でのハートマークの変更を「書込」側のハートマークへ反映
         callUpdateTrueOrFalse(emitted_post_id) {
-            if(this.my_id == this.user_id) {
+            if(this.my_info.id == this.user_id) {
                 console.log('this is callUpdateTrueOrFalse');
                 for(let i=0; i<this.$refs.child.length; i++) {
                     if(this.$refs.child[i].post.id == emitted_post_id) {
@@ -268,12 +289,44 @@ export default {
                 }
             }
         },
+        getPostedImagesForLightBox() {
+            console.log('this is getPostedImagesForLightBox');
+            axios
+                .get("/api/images/users/" + this.user_id + "/post")
+                .then(res => {
+                    this.posted_media = res.data;
+                });
+        },
+        getLikedImagesForLightBox() {
+            console.log('this is getLikedImagesForLightBox');
+            axios
+                .get("/api/images/users/" + this.user_id + "/like")
+                .then(res => {
+                    this.liked_media = res.data;
+                });
+        },
+        showImagesForPost(emitted_lightbox_index) {
+            this.$refs.lightbox_for_post.showImage(emitted_lightbox_index);
+        },
+        showImagesForLike(emitted_lightbox_index) {
+            this.$refs.lightbox_for_like.showImage(emitted_lightbox_index);
+        }
+
     },
     mounted() {
-        this.getMyId();
+        this.getMyInfo();
         this.getUserInfo();
         this.getUserPosts();
         this.getUserLikePosts();
+        this.getPostedImagesForLightBox();
+        this.getLikedImagesForLightBox();
+    },
+    watch: {
+        $route(to,from) {
+            this.updateUserId();
+            this.getUserInfo();
+            this.getUserPosts();
+        }
     }
 };
 </script>

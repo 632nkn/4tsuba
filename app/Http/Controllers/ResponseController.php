@@ -30,4 +30,14 @@ class ResponseController extends Controller
         Response::where('thread_id', $request->thread_id)
             ->where('origin_d_post_id', $request->displayed_post_id)->delete();
     }
+    //VueRouter遷移前スレッド存在確認
+    public function exists($thread_id, $displayed_post_id)
+    {
+        //文字列をURLに入力されたら無理やり0に変換
+        $converted_thread_id = (int)$thread_id;
+        $converted_displayed_post_id = (int)$displayed_post_id;
+
+        return Response::where('thread_id', $converted_thread_id)
+            ->where('dest_d_post_id', $converted_displayed_post_id)->count();
+    }
 }

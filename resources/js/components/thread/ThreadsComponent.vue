@@ -19,6 +19,7 @@
             >
                 <thread-object-component
                     v-bind:thread="thread"
+                    v-bind:my_info="my_info"
                 ></thread-object-component>
             </router-link>
         </div>
@@ -33,12 +34,19 @@ import ThreadObjectComponent from "./ThreadObjectComponent.vue";
 export default {
     data() {
         return {
+            my_info: {},
             threads: [],
             headline: "スレッド一覧",
             received_sort_object: {}
         };
     },
     methods: {
+        getMyInfo() {
+            console.log("this is getMyInfo");
+            axios.get("/api/users/me/info").then(res => {
+                this.my_info = res.data;
+            });
+        },
         updateSort(emited_sort_object) {
             console.log("this is updateSort");
             this.received_sort_object = emited_sort_object;
@@ -67,6 +75,7 @@ export default {
         ThreadObjectComponent
     },
     mounted() {
+        this.getMyInfo();
         this.getThreads();
     }
 };

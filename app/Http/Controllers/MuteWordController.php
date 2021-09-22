@@ -6,7 +6,6 @@ use App\Models\MuteWord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
 
 class MuteWordController extends Controller
 {
@@ -17,14 +16,6 @@ class MuteWordController extends Controller
 
     public function store(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'mute_word' => 'required|unique:mute_words|max:255',
-        // ]);
-
-        // if ($validator->fails()) {
-        //     $errors = $validator->errors();
-        //     return $errors;
-        // }
 
         //既に登録済みか否かをチェック
         $is_already_stored = MuteWord::where('user_id', Auth::id())->where('mute_word', $request->mute_word)->count();
@@ -40,6 +31,8 @@ class MuteWordController extends Controller
 
     public function destroy(Request $request)
     {
-        MuteWord::where('user_id', Auth::id())->where('id', $request->id)->delete();
+        $target_mute_word = MuteWord::where('user_id', Auth::id())->where('id', $request->id)->first();
+        $this->authorize('delete', $target_mute_word);
+        $target_mute_word->delete();
     }
 }

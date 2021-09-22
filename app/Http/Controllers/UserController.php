@@ -30,6 +30,14 @@ class UserController extends Controller
         }
     }
 
+    public function exists($user_id)
+    {
+        //文字列をURLに入力されたら無理やり0に変換
+        $converted_user_id = (int)$user_id;
+
+        return User::where('id', $converted_user_id)->count();
+    }
+
     public function editProfile(Request $request)
     {
         User::find(Auth::id())->update(['name' => $request->name,]);

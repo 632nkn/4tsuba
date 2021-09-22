@@ -8,7 +8,7 @@
             <post-object-component
                 v-bind:post="post"
                 v-bind:index="index"
-                v-bind:my_id="my_id"
+                v-bind:my_info="my_info"
                 v-bind:need_thread="true"
                 v-bind:search="true"
             >
@@ -33,17 +33,17 @@ export default {
     },
     data() {
         return {
-            my_id: 0,
+            my_info: {},
             thread: {},
             posts: {},
             unique_word_list: {},
         };
     },
     methods: {
-        getMyId() {
-            console.log("this is getMyId");
-            axios.get("/api/users/me").then(res => {
-                this.my_id = res.data;
+        getMyInfo() {
+            console.log("this is getMyInfo");
+            axios.get("/api/users/me/info").then(res => {
+                this.my_info = res.data;
             });
         },
         getSearchedPosts() {
@@ -82,10 +82,6 @@ export default {
             
 
         },
-        giveHightlight(search_word) {
-            let hightlighted_word = '<span class="indigo--text">' + search_word + '</span>';
-            return hightlighted_word;
-        } 
     },
     watch: {
         search_string: function() {
@@ -97,7 +93,7 @@ export default {
         PostObjectComponent,
     },
     mounted() {
-        this.getMyId();
+        this.getMyInfo();
         this.getSearchedPosts();
     },
 };

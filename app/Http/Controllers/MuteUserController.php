@@ -31,6 +31,10 @@ class MuteUserController extends Controller
 
     public function destroy(Request $request)
     {
-        MuteUser::where('muting_user_id', Auth::id())->where('user_id', $request->user_id)->delete();
+        $target_mute_user = MuteUser::where('muting_user_id', Auth::id())
+            ->where('user_id', $request->user_id)->first();
+
+        $this->authorize('delete', $target_mute_user);
+        $target_mute_user->delete();
     }
 }

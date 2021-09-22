@@ -17,6 +17,8 @@ class MuteWord extends Model
     protected $fillable = [
         'user_id', 'mute_word'
     ];
+    protected $hidden = ['created_at', 'updated_at'];
+
 
     //リレーション定義
     public function user()

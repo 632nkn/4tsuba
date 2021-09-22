@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 
@@ -18,7 +17,11 @@ class AuthController extends Controller
 
     public function returnMyId()
     {
-        return Auth::id();
+        if (Auth::id()) {
+            return Auth::id();
+        } else {
+            return null;
+        }
     }
 
     public function returnMyInfo()
@@ -30,31 +33,25 @@ class AuthController extends Controller
         }
     }
 
-    public function checkPassword(Request $request)
+    public function editAccount(Request $request)
     {
-        $current_password = Auth::user()->password;
-        return (Hash::check($request->password, $current_password));
-    }
+        $user = User::findOrFail(Auth::id());
+        //ユーザーがゲストでないことを確認
+        $this->authorize('checkUserIsNotGuest', $user);
 
-    public function editPersonal(Request $request)
-    {
-        $user = User::find(Auth::id())->first();
+        if ($user->checkPassword($request->current_password)) {
+            // $request->validate([
+            //     'email' => ['required', 'email', 'unique:users'],
+            //     'password' => ['required', 'between:8,20'],
+            // ]);
 
-        if ($user->role !== 'guest') {
-
-            $request->validate([
-                'email' => ['required', 'email', 'unique:users'],
-                'password' => ['required', 'between:8,20'],
-            ]);
 
             $user->update([
                 'email' => $request->email,
                 'password' => bcrypt($request->password)
             ]);
-        }
-        //ゲストユーザーは変更禁止
-        else {
-            return 'guest';
+        } else {
+            return 'bad_password';
         }
     }
 
@@ -98,5 +95,18 @@ class AuthController extends Controller
 
         //user作成が成功したら、ログイン扱い
         $this->login($request);
+    }
+
+    public function destroy(Request $request)
+    {
+        $user = User::findOrFail(Auth::id());
+        //ユーザーがゲストでないことを確認
+        $this->authorize('checkUserIsNotGuest', $user);
+
+        if ($user->checkPassword($request->password)) {
+            $user->delete();
+        } else {
+            return 'bad_password';
+        }
     }
 }

@@ -30,8 +30,10 @@ class LikeController extends Controller
 
     public function destroy(Request $request)
     {
-        $like = Like::where('user_id', Auth::id())->where('post_id', $request->post_id);
-        $like->delete();
+        $target_like = Like::where('user_id', Auth::id())
+            ->where('post_id', $request->post_id)->first();
+        $this->authorize('delete', $target_like);
+        $target_like->delete();
 
         //threadsテーブルのlike_countデクリメント
         $thread = new Thread();

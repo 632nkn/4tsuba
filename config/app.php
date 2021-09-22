@@ -106,7 +106,7 @@ return [
     |
     */
 
-    'faker_locale' => 'en_US',
+    'faker_locale' => 'ja_JP',
 
     /*
     |--------------------------------------------------------------------------
@@ -174,7 +174,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\TelescopeServiceProvider::class,
+        //localでのみ使用する(本番環境で使用しない)ためコメントアウト
+        //App\Providers\TelescopeServiceProvider::class,
 
         //laravel-log-viewer
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
